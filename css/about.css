@@ -1,0 +1,95 @@
+/*
+  自己紹介。仕様は docs/pages.md「自己紹介」。
+*/
+
+.about-main {
+  max-width: var(--content-narrow);
+  margin: 0 auto;
+  padding: 40px 24px 88px;
+}
+
+@media (max-width: 480px) {
+  .about-main { padding-left: 16px; padding-right: 16px; }
+}
+
+.about-label {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.about-name {
+  font-size: 48px;
+  line-height: 1.3;
+}
+
+@media (max-width: 480px) {
+  .about-name { font-size: 38px; }
+}
+
+.about-intro {
+  margin: 24px 0 0;
+  max-width: 32em;
+  font-size: 17px;
+  line-height: 1.95;
+}
+
+/* ===== セクション ===== */
+.about-section {
+  margin-top: 56px;
+  border-top: 1px solid var(--color-line);
+  padding-top: 32px;
+}
+
+.about-section__title {
+  margin-bottom: 12px;
+  font-size: 26px;
+}
+
+/* ===== ぼすもちのこと ===== */
+.about-mochi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  align-items: center;
+  margin-top: 64px;
+}
+
+.about-mochi__image {
+  flex: 0 0 160px;
+  width: 160px;
+  height: auto;
+}
+
+.about-mochi__text {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
+.about-mochi__text p {
+  margin: 0;
+  line-height: 1.95;
+}
+
+/* ===== れんらく ===== */
+.about-contact__lead {
+  margin: 0 0 16px;
+  font-size: 15px;
+  color: var(--color-text-sub);
+}
+
+.about-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.about-contact a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  text-underline-offset: 4px;
+}

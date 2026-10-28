@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bosumoti-game ・ 目標は一つ、高得点。</title>
+<meta name="description" content="1プレイ数分の2Dゲームを置いています。どれも操作はシンプル。作風はばらばらです。">
+<script src="js/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="design/tokens.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/top.css">
+<link rel="icon" href="assets/bosumoti-logo.svg" type="image/svg+xml">
+<script type="module" src="js/top.js"></script>
+</head>
+<body>
+
+<header class="site-header container">
+  <a class="site-logo" href="index.html">
+    <img class="site-logo__mochi" src="assets/bosumoti-logo.svg" alt="" width="44" height="44">
+    <span class="site-logo__name">bosumoti-game</span>
+  </a>
+  <div class="site-header__right">
+    <nav class="site-nav" aria-label="メイン">
+      <a href="#games" aria-current="page">ゲーム</a>
+      <a href="records.html">この端末の記録</a>
+      <a href="news.html">お知らせ</a>
+      <a href="about.html">自己紹介</a>
+    </nav>
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="テーマを切り替え">
+      <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+      <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"></path></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="hero container">
+    <div class="hero__text">
+      <h1 class="heading hero__title">目標は一つ、<br><span class="mark" style="--m: var(--color-game)">高得点</span>。</h1>
+      <p class="hero__lead">1プレイ数分の2Dゲームを置いています。どれも操作はシンプル。作風はばらばらです。</p>
+      <p class="hero__you">
+        あなたは
+        <span class="hero__player" data-you>—</span>
+        <a href="records.html">名前を変える</a>
+      </p>
+    </div>
+    <img class="hero__mochi" src="assets/bosumoti-normal.svg" alt="" width="260" height="252">
+  </section>
+
+  <section class="top-section container" id="games" aria-labelledby="games-heading">
+    <div class="top-section__head">
+      <span class="top-section__no num">01</span>
+      <h2 class="heading top-section__title" id="games-heading"><span class="mark" style="--m: var(--color-game)">ゲーム</span></h2>
+    </div>
+    <div class="game-grid" data-games></div>
+  </section>
+
+  <section class="top-section container" id="news" aria-labelledby="news-heading">
+    <div class="top-section__head">
+      <span class="top-section__no num">02</span>
+      <h2 class="heading top-section__title" id="news-heading"><span class="mark" style="--m: var(--color-news)">お知らせ</span></h2>
+      <a class="top-section__more" href="news.html">すべて見る</a>
+    </div>
+    <ul class="news-list" data-news></ul>
+  </section>
+</main>
+
+<footer class="top-footer container">
+  <div class="top-footer__inner">
+    <p class="top-footer__about">
+      <span class="top-section__no num">03</span>
+      つくっている人は
+      <a class="top-footer__creator heading" href="about.html"><span class="mark" style="--m: var(--color-about)">ボスモチシロ</span></a>
+    </p>
+    <p class="top-footer__note">記録はこの端末に保存されます ・ © 2026 bosumoti-game</p>
+  </div>
+</footer>
+
+</body>
+</html>

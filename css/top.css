@@ -1,0 +1,264 @@
+/*
+  トップページ。仕様は docs/pages.md「トップ」。
+*/
+
+/* ===== 見出しとぼすもち ===== */
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  align-items: flex-end;
+  padding-top: 48px;
+  padding-bottom: 72px;
+}
+
+.hero__text {
+  flex: 1 1 480px;
+  min-width: 0;
+}
+
+.hero__title {
+  font-size: 64px;
+  line-height: 1.35;
+}
+
+.hero__lead {
+  margin: 24px 0 0;
+  max-width: 28em;
+  line-height: 1.9;
+  color: var(--color-text-sub);
+}
+
+.hero__you {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 28px 0 0;
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.hero__player {
+  font-size: 17px;
+  color: var(--color-text);
+}
+
+.hero__you a {
+  font-size: 13px;
+  text-underline-offset: 4px;
+  /* タップしやすい高さを取る */
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+}
+
+.hero__mochi {
+  flex: 0 1 260px;
+  width: 260px;
+  max-width: 60%;
+  height: auto;
+}
+
+@media (max-width: 640px) {
+  .hero { padding-top: 24px; padding-bottom: 56px; }
+  .hero__title { font-size: 44px; }
+  .hero__mochi { margin-left: auto; width: 180px; }
+}
+
+/* ===== セクションの見出し ===== */
+.top-section {
+  padding-bottom: 88px;
+}
+
+.top-section__head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 24px;
+  border-top: 1px solid var(--color-line);
+  padding-top: 32px;
+}
+
+.top-section__no {
+  font-size: 13px;
+  color: var(--color-text-sub);
+}
+
+.top-section__title {
+  font-size: 32px;
+}
+
+.top-section__more {
+  margin-left: auto;
+  font-size: 14px;
+  text-underline-offset: 4px;
+}
+
+/* ===== ゲーム ===== */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 32px 24px;
+}
+
+.game-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-decoration: none;
+  transition: transform var(--dur-base) ease;
+}
+
+.game-card:hover,
+.game-card:focus-visible {
+  opacity: 1;
+  transform: translateY(-4px);
+}
+
+/* 最新のゲームは1行まるごと使って横長に */
+.game-card--latest {
+  grid-column: 1 / -1;
+}
+
+.game-card__image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.game-card--latest .game-card__image {
+  aspect-ratio: 21 / 8;
+}
+
+/* 狭い画面で 21:8 だと細くなりすぎるので、少しだけ高さを取る */
+@media (max-width: 640px) {
+  .game-card--latest .game-card__image { aspect-ratio: 16 / 9; }
+}
+
+.game-card__info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+}
+
+.game-card__name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.game-card__no {
+  font-size: 12px;
+  color: var(--color-text-sub);
+}
+
+.game-card__name {
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.game-card--latest .game-card__name {
+  font-size: 22px;
+}
+
+.game-card__new {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--color-game);
+  color: var(--color-on-game);
+  font-family: var(--font-number);
+  font-size: 11px;
+}
+
+.game-card__best {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 14px;
+  font-size: 13px;
+  color: var(--color-text-sub);
+}
+
+.game-card__best-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.game-card__best-value {
+  font-family: var(--font-number);
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+/* ===== お知らせ ===== */
+.news-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.news-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.news-list__date {
+  font-family: var(--font-number);
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.news-list__title {
+  text-decoration: none;
+}
+
+.news-list__empty {
+  color: var(--color-text-sub);
+}
+
+/* ===== つくっている人とフッター ===== */
+.top-footer {
+  padding-bottom: 48px;
+}
+
+.top-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-line);
+  padding-top: 32px;
+}
+
+.top-footer__about {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin: 0;
+  font-size: 15px;
+}
+
+.top-footer__creator {
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.top-footer__note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-sub);
+}

@@ -1,0 +1,262 @@
+/*
+  この端末の記録。仕様は docs/pages.md「この端末の記録」。
+*/
+
+.records-main {
+  max-width: var(--content-narrow);
+  margin: 0 auto;
+  padding: 40px 24px 88px;
+}
+
+@media (max-width: 480px) {
+  .records-main { padding-left: 16px; padding-right: 16px; }
+}
+
+.records-title {
+  font-size: 44px;
+  line-height: 1.3;
+}
+
+@media (max-width: 480px) {
+  .records-title { font-size: 34px; }
+}
+
+.records-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 24px;
+  margin: 20px 0 40px;
+}
+
+.records-summary p { margin: 0; }
+
+.records-summary__player {
+  font-size: 22px;
+}
+
+.records-summary__player .player-name__tag {
+  font-size: 14px;
+}
+
+.records-summary__player .player-name__tag:only-child {
+  font-size: 20px;
+  color: var(--color-text);
+}
+
+.records-summary__played {
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.records-summary__played .num {
+  font-size: 16px;
+  color: var(--color-text);
+}
+
+/* ===== 表 ===== */
+.records-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.records-table caption {
+  padding-bottom: 10px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--color-text-sub);
+}
+
+.records-table thead tr {
+  border-bottom: 1px solid var(--color-text);
+}
+
+.records-table th {
+  padding: 8px 0;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-sub);
+}
+
+.records-table td {
+  padding: 14px 0;
+}
+
+.records-table th:first-child,
+.records-table td:first-child {
+  width: 3.5em;
+}
+
+.records-table .is-num {
+  text-align: right;
+  padding-left: 16px;
+}
+
+.records-table tbody tr {
+  border-bottom: 1px solid var(--color-line);
+  transition: background-color var(--dur-fast) ease;
+}
+
+.records-table tbody tr:hover {
+  background-color: var(--color-hover);
+}
+
+.records-table__no {
+  font-family: var(--font-number);
+  font-size: 13px;
+  color: var(--color-text-sub);
+}
+
+.records-table__game {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* モードのあるゲーム：ゲームの行の下にモードの行を並べる */
+.records-table tr.is-game-with-modes {
+  border-bottom: 0;
+}
+
+.records-table tr.is-game-with-modes td {
+  padding-bottom: 4px;
+}
+
+.records-table tr.is-mode td {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.records-table tr.is-mode:not(.is-mode-last) {
+  border-bottom: 0;
+}
+
+.records-table__mode {
+  padding-left: 1em;
+  font-size: 14px;
+}
+
+.records-table__value {
+  font-family: var(--font-number);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.records-table__unit {
+  margin-left: 4px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text-sub);
+}
+
+.records-table .is-empty {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text-sub);
+}
+
+.records-table__message td {
+  padding: 24px 0;
+  color: var(--color-text-sub);
+}
+
+.records-table__retry {
+  min-height: var(--tap-min);
+  margin-left: 8px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .records-table { font-size: 14px; }
+  .records-table .is-empty { font-size: 12px; }
+}
+
+/* ===== 名前の変更と、記録の保存について ===== */
+.records-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  margin-top: 56px;
+  border-top: 1px solid var(--color-line);
+  padding-top: 28px;
+}
+
+.name-form {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.name-form__label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.name-form__row {
+  display: flex;
+  gap: 8px;
+}
+
+.name-form__input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap-min);
+  padding: 0 14px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 16px;
+}
+
+.name-form__save {
+  min-height: var(--tap-min);
+  padding: 0 18px;
+  border: 1px solid var(--color-text);
+  border-radius: var(--radius-control);
+  background: transparent;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.name-form__save:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.name-form__message {
+  margin: 0;
+  min-height: 1.7em;
+  font-size: 13px;
+}
+
+.name-form__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-sub);
+}
+
+.records-about {
+  flex: 1 1 320px;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--color-text-sub);
+}
+
+.records-about__title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+}

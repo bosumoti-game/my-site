@@ -1,0 +1,3809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>REFLEX - 反射神経テスト</title>
+
+    <!-- 角ばった機械的・エンジニアリング味を持つ2フォント構成 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,700;1,700&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== デザイントークン（デフォルト: CLICKモード = 青系・ダーク） ===== */
+        :root {
+            --mode-color: #2563eb;          /* コアブルー */
+            --mode-color-hover: #1d4ed8;
+            --mode-color-dark: #1e3a8a;
+            --mode-color-light: #60a5fa;
+
+            --bg-page: #0d0f14;              /* 締まりのあるグラファイトブラック */
+            --bg-surface: #151821;           /* パネル・カード背景 */
+            --bg-surface-active: #1d222e;
+            --bg-play-area: #08090c;
+            --bg-inset: #090a0d;
+            
+            --border-ui: #262c3b;            /* 明瞭な1pxソリッドボーダー */
+            --border-ui-strong: #3d465c;
+            --lane-border: rgba(255, 255, 255, 0.04);
+            --judge-line-color: rgba(255, 255, 255, 0.15);
+
+            --text-title: #ffffff;
+            --text-main: #e2e8f0;
+            --text-muted: #828d9f;
+            --text-dark: #4b5565;
+
+            --danger: #dc2626;
+            --warning: #d97706;
+
+            --font-display: 'Chakra Petch', sans-serif;
+            --font-body: 'Chakra Petch', 'Noto Sans JP', sans-serif;
+
+            --shadow-card: 0 16px 36px rgba(0, 0, 0, 0.7);
+        }
+
+        /* ===== MOVEモード（緑系・ダーク） ===== */
+        body.mode-move {
+            --mode-color: #16a34a;          /* コアグリーン */
+            --mode-color-hover: #15803d;
+            --mode-color-dark: #14532d;
+            --mode-color-light: #4ade80;
+        }
+
+        /* ===== RACERモード（赤系・ダーク） ===== */
+        body.mode-racer {
+            --mode-color: #dc2626;          /* コアレッド */
+            --mode-color-hover: #b91c1c;
+            --mode-color-dark: #7f1d1d;
+            --mode-color-light: #f87171;
+        }
+
+        /* ===== SIGNALモード（シグナルイエロー系・ダーク） ===== */
+        body.mode-signal {
+            --mode-color: #eab308;          /* シグナルイエロー */
+            --mode-color-hover: #ca8a04;
+            --mode-color-dark: #854d0e;
+            --mode-color-light: #fde047;
+        }
+
+        /* イエロー背景上でのテキスト視認性確保（硬質なチャコールブラック：ダーク・ライト共通） */
+        body.mode-signal .btn:not(.btn-secondary),
+        body.mode-signal .segmented-btn.active,
+        body.mode-signal .f1-action-btn:active .f1-action-key,
+        body.mode-signal .f1-action-btn.pressed .f1-action-key,
+        body.mode-signal .f1-action-btn:active .f1-action-label,
+        body.mode-signal .f1-action-btn.pressed .f1-action-label {
+            color: #0f172a !important;
+        }
+
+        /* ===== ライトテーマ定義（紙とインクのような硬質なコントラスト） ===== */
+        body.theme-light {
+            --bg-page: #f1f3f7;              /* 工業的・硬質なライトグレー */
+            --bg-surface: #ffffff;           /* クリーンなホワイトパネル */
+            --bg-surface-active: #e2e5eb;
+            --bg-play-area: #e5e9f0;         /* ターゲットがはっきり映える背景 */
+            --bg-inset: #e8ebf1;
+            
+            --border-ui: #d0d5dd;            /* 境界線 */
+            --border-ui-strong: #98a2b3;
+            --lane-border: rgba(0, 0, 0, 0.06);
+            --judge-line-color: rgba(0, 0, 0, 0.2);
+
+            --text-title: #0f172a;           /* 濃密なチャコールブラック */
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --text-dark: #94a3b8;
+
+            --danger: #b91c1c;
+            --warning: #b45309;
+
+            --shadow-card: 0 10px 25px rgba(15, 23, 42, 0.08);
+        }
+
+        body.theme-light:not(.mode-move):not(.mode-racer):not(.mode-signal) {
+            --mode-color: #1d4ed8;          /* 高コントラストブルー */
+            --mode-color-hover: #1e40af;
+            --mode-color-dark: #172554;
+            --mode-color-light: #3b82f6;
+        }
+
+        body.theme-light.mode-move {
+            --mode-color: #15803d;          /* 高コントラストグリーン */
+            --mode-color-hover: #166534;
+            --mode-color-dark: #14532d;
+            --mode-color-light: #22c55e;
+        }
+
+        body.theme-light.mode-racer {
+            --mode-color: #b91c1c;          /* 高コントラストレッド */
+            --mode-color-hover: #991b1b;
+            --mode-color-dark: #7f1d1d;
+            --mode-color-light: #dc2626;
+        }
+
+        body.theme-light.mode-signal {
+            --mode-color: #ca8a04;          /* 高コントラストシグナルイエロー */
+            --mode-color-hover: #a16207;
+            --mode-color-dark: #713f12;
+            --mode-color-light: #eab308;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            height: 100dvh; /* スマホのアドレスバー出入りに対応 */
+            overflow: hidden;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        /* ===== コントロールボタン群（左上：FULL / 右上：THEME） ===== */
+        .ctrl-btn {
+            position: fixed;
+            z-index: 50;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            font-family: var(--font-display);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-ui);
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.15s ease;
+            outline: none;
+        }
+
+        /* フルスクリーンボタン：画面「左上」に配置 */
+        #fullscreen-btn {
+            top: 14px;
+            left: 14px;
+        }
+
+        /* テーマ切替ボタン：画面「右上」に配置 */
+        #theme-toggle-btn {
+            top: 14px;
+            right: 14px;
+        }
+
+        .ctrl-btn:hover {
+            color: var(--text-title);
+            background: var(--bg-surface-active);
+            border-color: var(--border-ui-strong);
+        }
+
+        .ctrl-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* ゲームプレイ中・カウントダウン中は誤操作防止のため非表示 */
+        body.in-game .ctrl-btn,
+        body:has(#game-screen.active) .ctrl-btn,
+        body:has(#countdown-screen.active) .ctrl-btn {
+            display: none !important;
+        }
+
+        /* ===== 共通スクリーンレイアウト ===== */
+        .screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 20px;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* 高さの低い画面（スマホ横向き等）でゲーム画面以外をスクロール可能にする。
+           収まる場合は中央寄せ、はみ出す場合は上から並べる */
+        .screen:not(#game-screen) {
+            overflow-y: auto;
+            justify-content: flex-start;
+        }
+        .screen:not(#game-screen) > :first-child { margin-top: auto; }
+        .screen:not(#game-screen) > :last-child  { margin-bottom: auto; }
+
+        /* ===== Segmented Control ===== */
+        .segmented-control {
+            display: flex;
+            position: relative;
+            background: var(--bg-inset);
+            border: 1px solid var(--border-ui);
+            border-radius: 6px;
+            padding: 3px;
+            margin-bottom: 28px;
+            width: 440px;
+            max-width: 94vw;
+        }
+
+        .segmented-btn {
+            flex: 1 1 0%;
+            width: 25%;
+            height: 36px;
+            padding: 0 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            line-height: 1;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-align: center;
+            color: var(--text-muted);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: color 0.15s ease;
+            z-index: 2;
+            outline: none;
+            white-space: nowrap;
+        }
+
+        .segmented-btn.active {
+            color: #ffffff;
+        }
+
+        .segmented-slider {
+            position: absolute;
+            top: 3px;
+            bottom: 3px;
+            left: 3px;
+            width: calc((100% - 6px) / 4);
+            background: var(--mode-color);
+            border-radius: 4px;
+            transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s;
+            z-index: 1;
+        }
+
+        /* ===== ソリッドボタンスタイル ===== */
+        .btn {
+            position: relative;
+            padding: 14px 40px;
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+            background: var(--mode-color);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--mode-color-dark);
+            transition: transform 0.08s ease, background 0.15s ease;
+            outline: none;
+        }
+
+        .btn:hover {
+            background: var(--mode-color-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 0 var(--mode-color-dark);
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 var(--mode-color-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-ui);
+            color: var(--text-muted);
+            box-shadow: 0 3px 0 var(--border-ui-strong);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-surface-active);
+            color: var(--text-title);
+            border-color: var(--border-ui-strong);
+            box-shadow: 0 4px 0 var(--border-ui-strong);
+        }
+
+        .btn-secondary:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 var(--border-ui-strong);
+        }
+
+        /* ===== 1. オープニング画面 ===== */
+        #start-screen {
+            text-align: center;
+        }
+
+        #mode-badge {
+            display: none !important;
+        }
+
+        .game-title-group {
+            margin-bottom: 24px;
+        }
+
+        #start-screen h1 {
+            font-family: var(--font-body);
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: -0.01em;
+            color: var(--text-title);
+            margin-bottom: 8px;
+        }
+
+        #mode-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            min-height: 48px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #player-name {
+            width: 280px;
+            padding: 12px 16px;
+            font-family: var(--font-body);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-title);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-ui);
+            border-radius: 6px;
+            outline: none;
+            text-align: center;
+            transition: border-color 0.15s;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        #player-name:focus {
+            border-color: var(--mode-color);
+        }
+
+        #name-hint {
+            color: var(--text-dark);
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+
+        #name-error {
+            color: var(--danger);
+            font-size: 0.82rem;
+            font-weight: 700;
+            height: 20px;
+            margin-top: 4px;
+        }
+
+        .btn-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            width: 280px;
+        }
+
+        .btn-wrapper .btn {
+            width: 100%;
+        }
+
+        /* ===== 2. カウントダウン画面 ===== */
+        #countdown-text {
+            font-family: var(--font-display);
+            font-size: 9rem;
+            font-weight: 700;
+            color: var(--text-title);
+            animation: pulseCount 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes pulseCount {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* ===== 3. ゲームプレイ画面 ===== */
+        #game-screen {
+            justify-content: flex-start;
+            padding-top: 20px;
+        }
+
+        #game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 680px;
+            padding: 12px 20px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-ui);
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .hud-item {
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--text-dark);
+        }
+
+        .hud-value {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-title);
+            line-height: 1.1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .time-bar-container {
+            width: 100px;
+            height: 4px;
+            background: var(--bg-inset);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        #time-progress {
+            width: 100%;
+            height: 100%;
+            background: var(--mode-color);
+            transition: width 1s linear;
+        }
+
+        #play-area {
+            position: relative;
+            width: 90%;
+            max-width: 680px;
+            height: 68vh;
+            background: var(--bg-play-area);
+            border-radius: 6px;
+            border: 1px solid var(--border-ui);
+            overflow: hidden;
+            transition: background-color 0.2s ease;
+        }
+
+        /* CLICKモード用：ソリッドターゲット */
+        #target-circle {
+            display: none;
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            background: var(--mode-color);
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.05s ease-out;
+        }
+
+        #target-circle:active {
+            transform: scale(0.9);
+        }
+
+        .hit-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--mode-color);
+            pointer-events: none;
+            animation: particleFade 0.3s ease-out forwards;
+        }
+
+        @keyframes particleFade {
+            0% { transform: translate(0, 0); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+        }
+
+        /* ===== MOVEモード ===== */
+        #move-stage {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .lanes-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 50px);
+            display: flex;
+        }
+
+        .lane-col {
+            flex: 1;
+            border-right: 1px solid var(--lane-border);
+            height: 100%;
+            position: relative;
+        }
+        .lane-col:last-child { border-right: none; }
+        .lane-col:nth-child(4) { border-right: 1px solid var(--border-ui-strong); }
+
+        .key-guides {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            display: flex;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-ui);
+        }
+
+        .key-cap {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            border-right: 1px solid var(--border-ui);
+            cursor: pointer;
+            transition: background 0.1s, color 0.1s;
+        }
+        .key-cap:last-child { border-right: none; }
+        .key-cap:nth-child(4) { border-right: 1px solid var(--border-ui-strong); }
+        .key-cap.pressed {
+            background: var(--mode-color);
+            color: #ffffff;
+        }
+
+        .judge-line {
+            position: absolute;
+            bottom: 74px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--judge-line-color);
+        }
+
+        #move-player {
+            position: absolute;
+            bottom: 56px;
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            background: var(--mode-color);
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: left 0.05s ease-out;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .obstacle-row {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 26px;
+            display: flex;
+            pointer-events: none;
+        }
+
+        .obstacle-block {
+            flex: 1;
+            margin: 0 1px;
+            border-radius: 2px;
+            background: #b91c1c;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .obstacle-block.hole {
+            background: transparent !important;
+            border: 1px dashed var(--border-ui-strong);
+        }
+
+        /* ===== RACERモード ===== */
+        #racer-stage {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .racer-holder-bar {
+            position: absolute;
+            top: 24px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 10%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .racer-hand-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hand-grip {
+            width: 76px;
+            height: 8px;
+            background: var(--border-ui-strong);
+            border-radius: 2px;
+        }
+
+        .hand-label {
+            font-family: var(--font-display);
+            font-size: 0.68rem;
+            letter-spacing: 0.1em;
+            color: var(--text-dark);
+            margin-top: 6px;
+            font-weight: 700;
+        }
+
+        .racer-ball {
+            position: absolute;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: var(--mode-color);
+            border: 2px solid #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+            z-index: 10;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.05s ease-out;
+        }
+
+        .racer-ball.caught {
+            background: #16a34a;
+            transform: scale(1.1);
+        }
+
+        .racer-ball.faulted {
+            background: var(--warning);
+        }
+
+        #racer-feedback {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.1s ease-out;
+            z-index: 20;
+        }
+
+        #racer-feedback.active {
+            opacity: 1;
+        }
+
+        #racer-feedback .feedback-main {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 6vw, 2.6rem);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-align: center;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        #racer-feedback .feedback-sub {
+            font-family: var(--font-display);
+            font-size: clamp(0.9rem, 3.2vw, 1.1rem);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--text-title);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-ui);
+            padding: 4px 14px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        #racer-feedback.slow .feedback-main { color: var(--danger); }
+        #racer-feedback.catch .feedback-main { color: #16a34a; }
+        #racer-feedback.double-catch .feedback-main { color: #2563eb; }
+        #racer-feedback.split .feedback-main { color: var(--warning); }
+        #racer-feedback.fault .feedback-main { color: var(--warning); }
+
+        .racer-catch-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            display: flex;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-ui);
+            z-index: 15;
+        }
+
+        .racer-catch-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            border: none;
+            border-right: 1px solid var(--border-ui);
+            cursor: pointer;
+            transition: background 0.08s;
+            outline: none;
+        }
+        .racer-catch-btn:last-child { border-right: none; }
+
+        .racer-catch-btn:active, .racer-catch-btn.pressed {
+            background: var(--mode-color);
+        }
+
+        .racer-catch-key {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-title);
+            line-height: 1;
+        }
+
+        .racer-catch-btn:active .racer-catch-key,
+        .racer-catch-btn.pressed .racer-catch-key {
+            color: #ffffff;
+        }
+
+        .racer-catch-label {
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--text-dark);
+            margin-top: 4px;
+        }
+
+        .racer-catch-btn:active .racer-catch-label,
+        .racer-catch-btn.pressed .racer-catch-label {
+            color: #ffffff;
+        }
+
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0, 0); }
+            20%, 60% { transform: translate(-6px, 3px); }
+            40%, 80% { transform: translate(6px, -3px); }
+        }
+        .shake { animation: screenShake 0.3s ease-out; }
+
+        /* ===== F1モード ===== */
+        #f1-stage {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .f1-gantry {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .f1-signal-box {
+            width: 106px;
+            padding: 18px 14px;
+            background: #0d0f14;
+            border: 2px solid var(--border-ui-strong);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
+        }
+
+        body.theme-light .f1-signal-box {
+            background: #181d27;
+            border-color: #3d465c;
+        }
+
+        .f1-lamp {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #230808;
+            border: 3px solid #3b1010;
+            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.9);
+            transition: background 0.04s, border-color 0.04s, box-shadow 0.04s;
+            position: relative;
+        }
+
+        .f1-lamp::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 52px;
+            height: 5px;
+            background: var(--border-ui-strong);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .f1-lamp.lit {
+            background: #ef4444;
+            border-color: #fca5a5;
+            box-shadow: 0 0 22px rgba(239, 68, 68, 0.9), inset 0 -2px 6px rgba(0, 0, 0, 0.35);
+        }
+
+        #f1-feedback {
+            position: absolute;
+            top: 71%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.1s ease-out;
+        }
+
+        #f1-feedback.active {
+            opacity: 1;
+        }
+
+        #f1-feedback .feedback-main {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 5.5vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-align: center;
+            line-height: 1.1;
+            white-space: nowrap;
+            color: var(--text-title);
+        }
+
+        #f1-feedback .feedback-sub {
+            font-family: var(--font-display);
+            font-size: clamp(0.85rem, 3.2vw, 1.05rem);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--text-title);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-ui);
+            padding: 4px 14px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        #f1-feedback.fault .feedback-main { color: var(--danger); }
+        #f1-feedback.success .feedback-main { color: #16a34a; }
+        #f1-feedback.go .feedback-main { color: #f59e0b; }
+        #f1-feedback.slow .feedback-main { color: var(--warning); }
+
+        .f1-action-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-ui);
+            z-index: 15;
+        }
+
+        .f1-action-btn {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: background 0.08s;
+            outline: none;
+        }
+
+        .f1-action-btn:active, .f1-action-btn.pressed {
+            background: var(--mode-color);
+        }
+
+        .f1-action-key {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-title);
+            line-height: 1;
+        }
+
+        .f1-action-btn:active .f1-action-key,
+        .f1-action-btn.pressed .f1-action-key {
+            color: #ffffff;
+        }
+
+        .f1-action-label {
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--text-dark);
+            margin-top: 4px;
+        }
+
+        .f1-action-btn:active .f1-action-label,
+        .f1-action-btn.pressed .f1-action-label {
+            color: #ffffff;
+        }
+
+        #f1-stats-row {
+            display: none;
+            justify-content: space-around;
+            background: var(--bg-inset);
+            border: 1px solid var(--border-ui);
+            border-radius: 4px;
+            padding: 10px;
+            margin: 12px 0;
+        }
+
+        /* ===== 4. リザルト画面 ===== */
+        @keyframes popUp {
+            0% { transform: scale(0.92); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pop {
+            animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        #result-content {
+            background: var(--bg-surface);
+            padding: 32px 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-ui);
+            text-align: center;
+            max-width: 460px;
+            width: 90%;
+            box-shadow: var(--shadow-card);
+        }
+
+        #result-content h2 {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            letter-spacing: 0.12em;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .score-display {
+            font-family: var(--font-display);
+            font-size: 4.6rem;
+            font-weight: 700;
+            color: var(--text-title);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 4px;
+        }
+
+        .score-unit {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-left: 6px;
+        }
+
+        .rank-display {
+            display: inline-block;
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            color: var(--mode-color);
+            background: var(--bg-inset);
+            border: 1px solid var(--border-ui);
+            padding: 4px 14px;
+            border-radius: 4px;
+            margin: 6px 0 12px;
+            font-weight: 700;
+        }
+
+        #racer-stats-row {
+            display: none;
+            justify-content: space-around;
+            background: var(--bg-inset);
+            border: 1px solid var(--border-ui);
+            border-radius: 4px;
+            padding: 10px;
+            margin: 12px 0;
+        }
+
+        .racer-stat-item {
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .racer-stat-val {
+            font-size: 1.1rem;
+            color: var(--text-title);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* ===== ヒストグラム表示エリア ===== */
+        #histogram-container {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-ui);
+        }
+
+        .histogram-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            letter-spacing: 0.05em;
+        }
+
+        .chart-wrapper {
+            display: flex;
+            align-items: flex-end;
+            height: 90px;
+            gap: 4px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid var(--border-ui);
+            justify-content: center;
+        }
+
+        .bar-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1 1 0;
+            min-width: 0;
+            max-width: 24px;
+            height: 100%;
+            justify-content: flex-end;
+            position: relative;
+        }
+
+        .bar-count-label {
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .bar-pill {
+            width: 100%;
+            border-radius: 2px 2px 0 0;
+            transition: height 0.4s ease-out;
+        }
+
+        .bar-pill.blue {
+            background: var(--border-ui-strong);
+        }
+
+        .bar-pill.red {
+            background: var(--mode-color);
+        }
+
+        .bar-bottom-label {
+            position: absolute;
+            bottom: -18px;
+            font-family: var(--font-display);
+            font-size: 0.6rem;
+            color: var(--text-dark);
+            white-space: nowrap;
+        }
+
+        @media (max-width: 480px) {
+            /* 狭い画面ではラベルが重ならないよう1本おきに表示 */
+            .bar-col:nth-child(even) .bar-bottom-label { visibility: hidden; }
+        }
+
+        /* ===== 5. ランキング画面 ===== */
+        #ranking-content {
+            background: var(--bg-surface);
+            padding: 28px;
+            border-radius: 8px;
+            border: 1px solid var(--border-ui);
+            box-shadow: var(--shadow-card);
+            width: 90%;
+            max-width: 440px;
+            text-align: center;
+        }
+
+        #ranking-content h2 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-title);
+            letter-spacing: 0.06em;
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 4px;
+            margin: 10px 0 20px 0;
+        }
+
+        .ranking-table th {
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 8px 10px;
+        }
+
+        .ranking-table td {
+            background: var(--bg-inset);
+            padding: 10px 12px;
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-title);
+            border: 1px solid var(--border-ui);
+        }
+
+        .ranking-table tr td:first-child {
+            border-radius: 4px 0 0 4px;
+            border-right: none;
+            width: 50px;
+            color: var(--text-dark);
+        }
+
+        .ranking-table tr td:nth-child(2) {
+            border-left: none;
+            border-right: none;
+            font-family: var(--font-body);
+            font-weight: 700;
+        }
+
+        .ranking-table tr td:last-child {
+            border-radius: 0 4px 4px 0;
+            border-left: none;
+            color: var(--mode-color);
+            text-align: right;
+        }
+
+        .rank-gold td:first-child { color: #f59e0b; }
+        .rank-silver td:first-child { color: #94a3b8; }
+        .rank-bronze td:first-child { color: #b45309; }
+
+        /* オンラインランキング：同名プレイヤーを区別するタグ（例: TARO#3F2A） */
+        .name-tag {
+            margin-left: 4px;
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--text-dark);
+        }
+
+        /* タグで名前列が広がってもスコアは1行に保つ（狭い画面ではタグ側が折り返す） */
+        .ranking-table tr td:last-child {
+            white-space: nowrap;
+        }
+
+        /* サイト（bosumoti-game）埋め込み時：ランキングはサイト側に出すため、ゲーム内のランキング導線を隠す */
+        body.embedded #rank-btn {
+            display: none;
+        }
+
+        /* サイトモード：名前はサイトのものを使うため入力欄を隠す（要素とidは autoPlay.js のため残す） */
+        body.site-mode #player-name {
+            display: none;
+        }
+
+        /* 自分の記録の行 */
+        .ranking-table tr.is-me td {
+            border-color: var(--mode-color);
+        }
+
+        /* 圏外の自分の行との区切り */
+        .ranking-table tr.ranking-gap td.gap-cell {
+            background: transparent;
+            border: none;
+            padding: 0;
+            color: var(--text-dark);
+            text-align: center;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 画面「左上」に配置されたフルスクリーンボタン -->
+    <button id="fullscreen-btn" class="ctrl-btn" title="フルスクリーン切り替え">
+        <span id="fullscreen-icon">⛶</span> <span id="fullscreen-label">FULL</span>
+    </button>
+
+    <!-- 画面「右上」に配置されたテーマ切り替えボタン -->
+    <button id="theme-toggle-btn" class="ctrl-btn" title="テーマ切り替え">
+        <span id="theme-icon">☀️</span> <span id="theme-label">LIGHT</span>
+    </button>
+
+    <!-- 1. オープニング画面 -->
+    <div id="start-screen" class="screen active">
+        <!-- Segmented Control -->
+        <div class="segmented-control">
+            <div class="segmented-slider" id="seg-slider"></div>
+            <button class="segmented-btn active" id="seg-click-btn">CLICK</button>
+            <button class="segmented-btn" id="seg-move-btn">MOVE</button>
+            <button class="segmented-btn" id="seg-racer-btn">RACER</button>
+            <button class="segmented-btn" id="seg-signal-btn">SIGNAL</button>
+        </div>
+
+        <div class="game-title-group">
+            <div class="title-badge" id="mode-badge">CLICK TEST MODE</div>
+            <h1 id="mode-title">反射神経ゲーム</h1>
+            <p id="mode-desc">ランダムに現れる円を素早くタップ！<br>制限時間は30秒間です。</p>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="player-name" placeholder="プレイヤー名を入力" autocomplete="off" maxlength="10">
+            <div id="name-hint">※ 同じ名前でプレイすると自己ベストが更新されます</div>
+            <div id="name-error"></div>
+        </div>
+
+        <div class="btn-wrapper">
+            <button id="start-btn" class="btn">ゲームスタート</button>
+            <button id="rank-btn" class="btn btn-secondary">ランキング</button>
+        </div>
+    </div>
+
+    <!-- ランキング画面 -->
+    <div id="ranking-screen" class="screen">
+        <div id="ranking-content">
+            <h2 id="ranking-title">LEADERBOARD</h2>
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th>順位</th>
+                        <th style="text-align: left;">名前</th>
+                        <th style="text-align: right;">スコア</th>
+                    </tr>
+                </thead>
+                <tbody id="ranking-tbody">
+                    <!-- 動的挿入 -->
+                </tbody>
+            </table>
+            <button id="back-to-start-btn" class="btn btn-secondary" style="width: 100%;">戻る</button>
+        </div>
+    </div>
+
+    <!-- 2. カウントダウン画面 -->
+    <div id="countdown-screen" class="screen">
+        <div id="countdown-text">3</div>
+    </div>
+
+    <!-- 3. ゲームプレイ画面 -->
+    <div id="game-screen" class="screen">
+        <div id="game-info">
+            <div class="hud-item">
+                <span id="hud-time-label">TIME REMAINING</span>
+                <span class="hud-value"><span id="time-left">30</span><span id="hud-unit">s</span></span>
+                <div class="time-bar-container" id="time-bar-box">
+                    <div id="time-progress"></div>
+                </div>
+            </div>
+            <div class="hud-item" style="align-items: flex-end;">
+                <span id="hud-score-label">SCORE</span>
+                <span class="hud-value" id="score">0</span>
+            </div>
+        </div>
+
+        <div id="play-area">
+            <!-- CLICKモード用円 -->
+            <div id="target-circle"></div>
+
+            <!-- MOVEモード用ステージ -->
+            <div id="move-stage">
+                <div class="lanes-grid">
+                    <div class="lane-col"></div><div class="lane-col"></div>
+                    <div class="lane-col"></div><div class="lane-col"></div>
+                    <div class="lane-col"></div><div class="lane-col"></div>
+                    <div class="lane-col"></div><div class="lane-col"></div>
+                </div>
+                <div class="judge-line"></div>
+                <div id="move-player"></div>
+                <div class="key-guides" id="key-guides">
+                    <div class="key-cap" data-lane="0">Q</div>
+                    <div class="key-cap" data-lane="1">W</div>
+                    <div class="key-cap" data-lane="2">E</div>
+                    <div class="key-cap" data-lane="3">R</div>
+                    <div class="key-cap" data-lane="4">U</div>
+                    <div class="key-cap" data-lane="5">I</div>
+                    <div class="key-cap" data-lane="6">O</div>
+                    <div class="key-cap" data-lane="7">P</div>
+                </div>
+            </div>
+
+            <!-- RACERモード用ステージ -->
+            <div id="racer-stage">
+                <div class="racer-holder-bar">
+                    <div class="racer-hand-slot">
+                        <div class="hand-grip"></div>
+                        <div class="hand-label">LEFT HAND</div>
+                    </div>
+                    <div class="racer-hand-slot">
+                        <div class="hand-grip"></div>
+                        <div class="hand-label">RIGHT HAND</div>
+                    </div>
+                </div>
+
+                <div id="racer-ball-left" class="racer-ball">F</div>
+                <div id="racer-ball-right" class="racer-ball">J</div>
+
+                <div id="racer-feedback">
+                    <div class="feedback-main">READY</div>
+                </div>
+
+                <div class="racer-catch-bar">
+                    <button class="racer-catch-btn" id="racer-btn-left" data-key="f">
+                        <span class="racer-catch-key">F</span>
+                        <span class="racer-catch-label">LEFT CATCH</span>
+                    </button>
+                    <button class="racer-catch-btn" id="racer-btn-right" data-key="j">
+                        <span class="racer-catch-key">J</span>
+                        <span class="racer-catch-label">RIGHT CATCH</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- F1モード用ステージ -->
+            <div id="f1-stage">
+                <div class="f1-gantry">
+                    <div class="f1-signal-box">
+                        <div class="f1-lamp" id="f1-lamp-1"></div>
+                        <div class="f1-lamp" id="f1-lamp-2"></div>
+                        <div class="f1-lamp" id="f1-lamp-3"></div>
+                    </div>
+                </div>
+
+                <div id="f1-feedback">
+                    <div class="feedback-main" id="f1-feedback-main">READY</div>
+                    <div class="feedback-sub" id="f1-feedback-sub">PRESS SPACE ON LIGHTS OUT</div>
+                </div>
+
+                <div class="f1-action-bar">
+                    <button class="f1-action-btn" id="f1-action-btn">
+                        <span class="f1-action-key">SPACE</span>
+                        <span class="f1-action-label">START REACTION (TAP OR SPACE)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. リザルト画面 -->
+    <div id="result-screen" class="screen">
+        <div id="result-content" class="animate-pop">
+            <h2>SESSION COMPLETED</h2>
+            <div class="score-display"><span id="final-score">0</span><span class="score-unit" id="final-unit">pts</span></div>
+            <div><div class="rank-display" id="result-rank">順位: - 位</div></div>
+            
+            <div id="racer-stats-row">
+                <div class="racer-stat-item">
+                    <span>成功回数</span>
+                    <span class="racer-stat-val" id="racer-stat-catches">- / -</span>
+                </div>
+                <div class="racer-stat-item">
+                    <span>最速反応</span>
+                    <span class="racer-stat-val" id="racer-stat-best">- ms</span>
+                </div>
+                <div class="racer-stat-item">
+                    <span>平均反応</span>
+                    <span class="racer-stat-val" id="racer-stat-avg">- ms</span>
+                </div>
+            </div>
+
+            <div id="f1-stats-row">
+                <div class="racer-stat-item">
+                    <span>反応速度</span>
+                    <span class="racer-stat-val" id="f1-stat-time">- ms</span>
+                </div>
+                <div class="racer-stat-item">
+                    <span>レーティング</span>
+                    <span class="racer-stat-val" id="f1-stat-rating">-</span>
+                </div>
+            </div>
+
+            <div id="histogram-container"></div>
+
+            <button id="restart-btn" class="btn" style="margin-top: 22px; width: 100%;">もう一度挑戦する</button>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================
+           Web Audio API（効果音システム：メモリリーク完全防止）
+        ========================================================== */
+        let audioCtx = null;
+        function initAudio() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+            } catch (e) {
+                console.warn('AudioContext init failed:', e);
+            }
+        }
+
+        function playTone(freq, type = 'sine', duration = 0.1, gainVal = 0.15) {
+            initAudio();
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+                osc.onended = () => {
+                    osc.disconnect();
+                    gain.disconnect();
+                };
+            } catch (e) {
+                // 音声APIのエラーでゲーム本体を停止させない
+            }
+        }
+
+        function playClickSound() { playTone(600, 'sine', 0.08, 0.12); }
+        function playCountSound() { playTone(480, 'sine', 0.15, 0.15); }
+        function playHitSound() {
+            initAudio();
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.06);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.09);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.09);
+                osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+            } catch (e) {}
+        }
+
+        function playMoveSound() {
+            initAudio();
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(650, audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.06);
+                osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+            } catch (e) {}
+        }
+
+        function playPassSound() { playTone(1050, 'sine', 0.08, 0.15); }
+
+        function playCrashSound() {
+            initAudio();
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(160, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.25);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+                osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+            } catch (e) {}
+        }
+
+        function playDropSound() {
+            initAudio();
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(700, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+                osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+            } catch (e) {}
+        }
+
+        function playCatchSound() {
+            initAudio();
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(950, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1900, audioCtx.currentTime + 0.07);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+                osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+            } catch (e) {}
+        }
+
+        function playDoubleCatchSound() {
+            initAudio();
+            if (!audioCtx) return;
+            [1046.5, 1318.5].forEach((freq, i) => {
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    const startTime = audioCtx.currentTime + i * 0.05;
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, startTime + 0.1);
+                    gain.gain.setValueAtTime(0.25, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.15);
+                    osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+                } catch (e) {}
+            });
+        }
+
+        function playSlowSound() {
+            initAudio();
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.35);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+                osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+            } catch (e) {}
+        }
+
+        function playPenaltySound() {
+            initAudio();
+            if (!audioCtx) return;
+            [220, 180].forEach((freq, i) => {
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    const startTime = audioCtx.currentTime + i * 0.12;
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    gain.gain.setValueAtTime(0.3, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.1);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.1);
+                    osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+                } catch (e) {}
+            });
+        }
+
+        function playEndSound() {
+            initAudio();
+            if (!audioCtx) return;
+            const chord = [523.25, 659.25, 783.99, 1046.50];
+            chord.forEach((freq, i) => {
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    const startTime = audioCtx.currentTime + i * 0.08;
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    gain.gain.setValueAtTime(0.12, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.35);
+                    osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+                } catch (e) {}
+            });
+        }
+
+        function playSignalBeep(freq = 750) {
+            initAudio();
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.12);
+                osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+            } catch (e) {}
+        }
+
+        /* ==========================================================
+           フルスクリーン管理（画面左上・iOS/Android互換安全実装）
+        ========================================================== */
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const fullscreenIcon = document.getElementById('fullscreen-icon');
+        const fullscreenLabel = document.getElementById('fullscreen-label');
+
+        function isFullscreenActive() {
+            return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        }
+
+        function updateFullscreenBtnState() {
+            if (!fullscreenBtn) return;
+            const isFull = isFullscreenActive();
+            if (fullscreenIcon) fullscreenIcon.textContent = isFull ? '🗗' : '⛶';
+            if (fullscreenLabel) fullscreenLabel.textContent = isFull ? 'EXIT' : 'FULL';
+        }
+
+        function toggleFullscreen() {
+            const docEl = document.documentElement;
+            try {
+                if (!isFullscreenActive()) {
+                    if (docEl.requestFullscreen) {
+                        docEl.requestFullscreen().catch(() => {});
+                    } else if (docEl.webkitRequestFullscreen) {
+                        docEl.webkitRequestFullscreen();
+                    } else if (docEl.mozRequestFullScreen) {
+                        docEl.mozRequestFullScreen();
+                    } else if (docEl.msRequestFullscreen) {
+                        docEl.msRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen().catch(() => {});
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            } catch (e) {
+                console.warn('Fullscreen request failed:', e);
+            }
+        }
+
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', () => {
+                playClickSound();
+                toggleFullscreen();
+            });
+        }
+
+        ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
+            document.addEventListener(evt, updateFullscreenBtnState);
+        });
+
+        /* ==========================================================
+           テーマ管理（画面右上・安定化ロジック）
+        ========================================================== */
+        const THEME_STORAGE_KEY = 'reflex_theme_preference';
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeLabel = document.getElementById('theme-label');
+
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.body.classList.add('theme-light');
+                if (themeIcon) themeIcon.textContent = '🌙';
+                if (themeLabel) themeLabel.textContent = 'DARK';
+            } else {
+                document.body.classList.remove('theme-light');
+                if (themeIcon) themeIcon.textContent = '☀️';
+                if (themeLabel) themeLabel.textContent = 'LIGHT';
+            }
+        }
+
+        function initTheme() {
+            try {
+                const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+                if (savedTheme) {
+                    applyTheme(savedTheme);
+                } else {
+                    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+                    applyTheme(prefersLight ? 'light' : 'dark');
+                }
+            } catch (e) {
+                applyTheme('dark');
+            }
+        }
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                playClickSound();
+                const isCurrentLight = document.body.classList.contains('theme-light');
+                const nextTheme = isCurrentLight ? 'dark' : 'light';
+                applyTheme(nextTheme);
+                try {
+                    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+                } catch (e) {}
+            });
+        }
+
+        initTheme();
+
+        /* ==========================================================
+           状態 & ストレージ管理（例外保護・プライベートモード対応）
+        ========================================================== */
+        let currentGameMode = 'click';
+        let score = 0;
+        let timeLeft = 30;
+        let gameTimer = null;
+        let currentTournamentName = '';
+        let isCountingDown = false;
+        let isGameActive = false;
+        let scoreAnimTimer = null;
+
+        function getStorageKey() {
+            const allowedModes = ['click', 'move', 'racer', 'signal'];
+            const safeMode = allowedModes.includes(currentGameMode) ? currentGameMode : 'click';
+            return `reflex_rankings_${safeMode}`;
+        }
+
+        /* 制御文字・Bidi制御文字・ゼロ幅文字（表示偽装対策） */
+        const NAME_STRIP_RE = /[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2060-\u2069\uFEFF]/g;
+
+        function getRankings() {
+            try {
+                const data = localStorage.getItem(getStorageKey());
+                if (!data) return [];
+                const parsed = JSON.parse(data);
+                if (!Array.isArray(parsed)) return [];
+                return parsed
+                    .filter(item => item && typeof item === 'object' && typeof item.name === 'string')
+                    .map(item => ({
+                        name: item.name.replace(NAME_STRIP_RE, '').trim().slice(0, 10),
+                        score: Math.max(0, Math.min(999999, Math.floor(Number(item.score) || 0)))
+                    }))
+                    .filter(item => item.name.length > 0);
+            } catch (e) {
+                console.warn('Storage read failed:', e);
+                return [];
+            }
+        }
+
+        function saveRankings(rankings) {
+            try {
+                localStorage.setItem(getStorageKey(), JSON.stringify(rankings));
+            } catch (e) {
+                console.warn('Storage save failed:', e);
+            }
+        }
+
+        /* ==========================================================
+           オンラインランキング（Google Apps Script 連携）
+           RANKING_API_URL が空の場合は、従来どおり端末内ランキングのみで動作する。
+           URL は gas/Code.gs をウェブアプリとしてデプロイした「…/exec」の URL を設定する。
+        ========================================================== */
+        const RANKING_API_URL = 'https://script.google.com/macros/s/AKfycbxJY00q_a3WjaPIy6fq7LR8RKJIon1S4B6V0zQR_SyByPfMysYGFJJXsBJGOmagH_A9/exec';
+        const RANKING_API_TIMEOUT_MS = 8000;
+        // POST はサーバーのロック待ち（最大10秒）と処理より長く待つ（短いと、記録済みなのに通信エラーになり二重に送る）
+        const RANKING_API_POST_TIMEOUT_MS = 25000;
+        const GAME_VERSION = '2.0.0';
+        const PROFILES_STORAGE_KEY = 'reflex_profiles';
+        const PENDING_STORAGE_KEY = 'reflex_pending_scores';
+        const PENDING_MAX = 20;
+        // スプレッドシートの数式として解釈され得る先頭文字（サーバー側でも拒否される）
+        const NAME_FORBIDDEN_LEAD_RE = /^[=+\-@]/;
+        // 再送しても結果が変わらないエラー（再送キューに入れない）
+        const NON_RETRYABLE_ERRORS = ['invalid_request', 'invalid_name', 'invalid_score', 'auth_failed', 'unknown_action'];
+
+        function isOnlineRankingEnabled() {
+            return /^https:\/\/\S+$/.test(RANKING_API_URL);
+        }
+
+        function randomHex(byteLength) {
+            const bytes = new Uint8Array(byteLength);
+            crypto.getRandomValues(bytes);
+            return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        /* UUID v4（crypto.randomUUID は file:// 等で使えない環境があるため自前生成） */
+        function generatePlayerId() {
+            const bytes = new Uint8Array(16);
+            crypto.getRandomValues(bytes);
+            bytes[6] = (bytes[6] & 0x0f) | 0x40;
+            bytes[8] = (bytes[8] & 0x3f) | 0x80;
+            const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+            return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+        }
+
+        /* 端末内のプロフィール（名前ごとに playerId と secret を保持。同じ名前＝同じプレイヤー） */
+        function loadProfiles() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(PROFILES_STORAGE_KEY) || '{}');
+                return (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveProfiles(profiles) {
+            try {
+                localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(profiles));
+            } catch (e) {
+                console.warn('Profile save failed:', e);
+            }
+        }
+
+        function isValidProfile(p) {
+            return !!p && typeof p.playerId === 'string' && /^[0-9a-f]{64}$/.test(p.secret || '') &&
+                /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(p.playerId);
+        }
+
+        function getProfile(name) {
+            if (!name) return null;
+            const profile = loadProfiles()[name.toLowerCase()];
+            return isValidProfile(profile) ? profile : null;
+        }
+
+        function getOrCreateProfile(name) {
+            const existing = getProfile(name);
+            if (existing) return existing;
+            const profiles = loadProfiles();
+            const profile = { playerId: generatePlayerId(), secret: randomHex(32), tag: '' };
+            profiles[name.toLowerCase()] = profile;
+            saveProfiles(profiles);
+            return profile;
+        }
+
+        function saveProfileTag(name, tag) {
+            if (typeof tag !== 'string' || !/^[0-9A-Z]{4}$/.test(tag)) return;
+            const profiles = loadProfiles();
+            const key = name.toLowerCase();
+            if (isValidProfile(profiles[key])) {
+                profiles[key].tag = tag;
+                saveProfiles(profiles);
+            }
+        }
+
+        /* ==========================================================
+           サイト（bosumoti-game）への埋め込み
+           埋め込まれていて、サイトのプレイヤー情報（localStorage "bosumoti.player"）が正しい形のときは
+           「サイトモード」で動き、名前・playerId・secret はサイトのものを使う。
+           サイトとゲームは同じオリジンに置く前提（localStorage を共有するため）。
+        ========================================================== */
+        const SITE_PLAYER_STORAGE_KEY = 'bosumoti.player';
+        const SITE_GAME_ID = 'reflex';
+        const IS_EMBEDDED = (() => {
+            try {
+                return window.parent !== window;
+            } catch (e) {
+                return true;
+            }
+        })();
+        const TAG_RE = /^[0-9A-Z]{4}$/;
+
+        function getSitePlayer() {
+            if (!IS_EMBEDDED) return null;
+            try {
+                const p = JSON.parse(localStorage.getItem(SITE_PLAYER_STORAGE_KEY) || 'null');
+                if (!p || typeof p !== 'object' || !isValidProfile(p) || typeof p.name !== 'string') return null;
+                const name = p.name.replace(NAME_STRIP_RE, '').trim().slice(0, 10);
+                if (!name || NAME_FORBIDDEN_LEAD_RE.test(name)) return null;
+                const tag = (typeof p.tag === 'string' && TAG_RE.test(p.tag)) ? p.tag : '';
+                return { playerId: p.playerId, secret: p.secret, name: name, tag: tag, isSite: true };
+            } catch (e) {
+                return null;
+            }
+        }
+
+        /* 送信の返事のタグをサイトのプレイヤー情報に書き戻す（ほかの項目は書き換えない） */
+        function saveSitePlayerTag(playerId, tag) {
+            if (typeof tag !== 'string' || !TAG_RE.test(tag)) return;
+            try {
+                const p = JSON.parse(localStorage.getItem(SITE_PLAYER_STORAGE_KEY) || 'null');
+                if (!p || typeof p !== 'object' || p.playerId !== playerId || p.tag === tag) return;
+                p.tag = tag;
+                localStorage.setItem(SITE_PLAYER_STORAGE_KEY, JSON.stringify(p));
+            } catch (e) {
+                console.warn('Site player save failed:', e);
+            }
+        }
+
+        /* サイトモードで同じプレイヤーなら、いまのサイトの名前に替える（古い名前で送って、サーバーの名前を戻さない） */
+        function withLatestSiteName(payload) {
+            const sitePlayer = getSitePlayer();
+            if (!sitePlayer || sitePlayer.playerId !== payload.playerId) return payload;
+            return Object.assign({}, payload, { name: sitePlayer.name });
+        }
+
+        /* 親ページ（サイト）への通知。宛先は同じオリジンに限定し、secret・playerId は含めない */
+        function postToSite(message) {
+            if (!IS_EMBEDDED) return;
+            try {
+                window.parent.postMessage(message, location.origin);
+            } catch (e) {
+                // file:// など宛先オリジンを指定できない環境では送らない
+            }
+        }
+
+        function postModeToSite() {
+            postToSite({ type: 'bosumoti:mode', game: SITE_GAME_ID, mode: currentGameMode });
+        }
+
+        /* online: 送信の返事（scores を除く）／ { ok: false, error } ／ オンライン無効時は null */
+        function postResultToSite(mode, displayedScore, online) {
+            postToSite({ type: 'bosumoti:result', game: SITE_GAME_ID, mode: mode, score: displayedScore, online: online });
+        }
+
+        /* API 呼び出し。通信失敗・タイムアウト・HTTPエラーは例外、アプリのエラーは { ok: false } で返る */
+        async function callRankingApi(method, params) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), method === 'GET' ? RANKING_API_TIMEOUT_MS : RANKING_API_POST_TIMEOUT_MS);
+            try {
+                let res;
+                if (method === 'GET') {
+                    const query = new URLSearchParams(params).toString();
+                    res = await fetch(`${RANKING_API_URL}?${query}`, { signal: controller.signal, cache: 'no-store' });
+                } else {
+                    // text/plain にすることで CORS のプリフライトを発生させない（GAS はプリフライト非対応）
+                    res = await fetch(RANKING_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(params),
+                        signal: controller.signal
+                    });
+                }
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                if (!data || typeof data !== 'object') throw new Error('Invalid response');
+                return data;
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        function loadPendingScores() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(PENDING_STORAGE_KEY) || '[]');
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        /* 保存できたら true、できなかったら false */
+        function savePendingScores(list) {
+            try {
+                localStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(list.slice(-PENDING_MAX)));
+                return true;
+            } catch (e) {
+                console.warn('Pending save failed:', e);
+                return false;
+            }
+        }
+
+        function isRetryableResult(data) {
+            return !data.ok && !NON_RETRYABLE_ERRORS.includes(data.error);
+        }
+
+        /* スコア送信。再送可能な失敗は未送信キューに積み、次回起動時・次回送信成功時に再送する */
+        async function submitScoreOnline(payload) {
+            try {
+                const data = await callRankingApi('POST', payload);
+                if (isRetryableResult(data)) {
+                    savePendingScores([...loadPendingScores(), payload]);
+                } else if (data.ok) {
+                    flushPendingScores();
+                }
+                return data;
+            } catch (e) {
+                savePendingScores([...loadPendingScores(), payload]);
+                throw e;
+            }
+        }
+
+        let isFlushingPending = false;
+        async function flushPendingScores() {
+            if (!isOnlineRankingEnabled() || isFlushingPending) return;
+            isFlushingPending = true;
+            try {
+                let pending = loadPendingScores();
+                while (pending.length > 0) {
+                    const data = await callRankingApi('POST', withLatestSiteName(pending[0]));
+                    if (isRetryableResult(data)) break;
+                    pending = loadPendingScores().slice(1);
+                    // 保存できないと先頭が消えず、同じスコアを送り続けてしまう。止める
+                    if (!savePendingScores(pending)) break;
+                }
+            } catch (e) {
+                // 通信できない間はキューを保持して次回に再送
+            } finally {
+                isFlushingPending = false;
+            }
+        }
+
+        /* サーバーでスコアを再計算するための生データ */
+        function buildScoreDetail() {
+            if (currentGameMode === 'racer') {
+                return { rounds: racerRoundLog.map(r => ({ drops: r.drops, times: r.times.slice(), penalty: r.penalty })) };
+            }
+            if (currentGameMode === 'signal') {
+                return { fault: f1IsFault, timeout: f1IsTimeout, reactionMs: (f1IsFault || f1IsTimeout) ? null : f1ReactionTime };
+            }
+            return {};
+        }
+
+        /* 全タイマー・アニメーションの安全破棄関数 */
+        let f1Timers = [];
+        function cleanupF1Timers() {
+            f1Timers.forEach(t => clearTimeout(t));
+            f1Timers = [];
+        }
+
+        function cleanupAllTimers() {
+            if (gameTimer) { clearInterval(gameTimer); gameTimer = null; }
+            if (countIntervalTimer) { clearInterval(countIntervalTimer); countIntervalTimer = null; }
+            if (moveAnimFrame) { cancelAnimationFrame(moveAnimFrame); moveAnimFrame = null; }
+            if (racerPhysicsAnim) { cancelAnimationFrame(racerPhysicsAnim); racerPhysicsAnim = null; }
+            if (racerDropTimer) { clearTimeout(racerDropTimer); racerDropTimer = null; }
+            if (racerRoundResolvedTimer) { clearTimeout(racerRoundResolvedTimer); racerRoundResolvedTimer = null; }
+            if (moveCrashTimer) { clearTimeout(moveCrashTimer); moveCrashTimer = null; }
+            if (scoreAnimTimer) { clearInterval(scoreAnimTimer); scoreAnimTimer = null; }
+            cleanupF1Timers();
+        }
+
+        /* ==========================================================
+           DOM要素取得
+        ========================================================== */
+        const startBtn = document.getElementById('start-btn');
+        const rankBtn = document.getElementById('rank-btn');
+        const backToStartBtn = document.getElementById('back-to-start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const targetCircle = document.getElementById('target-circle');
+        const playArea = document.getElementById('play-area');
+        const countdownText = document.getElementById('countdown-text');
+        const playerNameInput = document.getElementById('player-name');
+        const nameError = document.getElementById('name-error');
+        const timeProgress = document.getElementById('time-progress');
+        const timeBarBox = document.getElementById('time-bar-box');
+
+        const segClickBtn = document.getElementById('seg-click-btn');
+        const segMoveBtn = document.getElementById('seg-move-btn');
+        const segRacerBtn = document.getElementById('seg-racer-btn');
+        const segSlider = document.getElementById('seg-slider');
+
+        const modeBadge = document.getElementById('mode-badge');
+        const modeTitle = document.getElementById('mode-title');
+        const modeDesc = document.getElementById('mode-desc');
+
+        const moveStage = document.getElementById('move-stage');
+        const movePlayer = document.getElementById('move-player');
+        const keyGuides = document.querySelectorAll('.key-cap');
+
+        const racerStage = document.getElementById('racer-stage');
+        const racerBallLeft = document.getElementById('racer-ball-left');
+        const racerBallRight = document.getElementById('racer-ball-right');
+        const racerFeedback = document.getElementById('racer-feedback');
+        const racerBtnLeft = document.getElementById('racer-btn-left');
+        const racerBtnRight = document.getElementById('racer-btn-right');
+        const racerStatsRow = document.getElementById('racer-stats-row');
+
+        const segSignalBtn = document.getElementById('seg-signal-btn');
+        const f1Stage = document.getElementById('f1-stage');
+        const f1Lamp1 = document.getElementById('f1-lamp-1');
+        const f1Lamp2 = document.getElementById('f1-lamp-2');
+        const f1Lamp3 = document.getElementById('f1-lamp-3');
+        const f1Feedback = document.getElementById('f1-feedback');
+        const f1FeedbackMain = document.getElementById('f1-feedback-main');
+        const f1FeedbackSub = document.getElementById('f1-feedback-sub');
+        const f1ActionBtn = document.getElementById('f1-action-btn');
+        const f1StatsRow = document.getElementById('f1-stats-row');
+        const f1StatTime = document.getElementById('f1-stat-time');
+        const f1StatRating = document.getElementById('f1-stat-rating');
+
+        function showScreen(screenId) {
+            // 非表示になる画面内にフォーカスが残らないよう解除（Enter/Spaceの誤動作防止）
+            const focusedEl = document.activeElement;
+            if (focusedEl && focusedEl !== document.body &&
+                focusedEl.closest('.screen') && !focusedEl.closest(`#${screenId}`)) {
+                focusedEl.blur();
+            }
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(screenId);
+            if (target) target.classList.add('active');
+
+            // ゲーム・カウントダウン中はボタン非表示クラスを付与
+            if (screenId === 'game-screen' || screenId === 'countdown-screen') {
+                document.body.classList.add('in-game');
+            } else {
+                document.body.classList.remove('in-game');
+            }
+        }
+
+        /* ==========================================================
+           Segmented Control 切替処理
+        ========================================================== */
+        function switchGameMode(mode) {
+            if (currentGameMode === mode || isCountingDown || isGameActive) return;
+            currentGameMode = mode;
+            playClickSound();
+
+            segClickBtn.classList.toggle('active', mode === 'click');
+            segMoveBtn.classList.toggle('active', mode === 'move');
+            segRacerBtn.classList.toggle('active', mode === 'racer');
+            if (segSignalBtn) segSignalBtn.classList.toggle('active', mode === 'signal');
+
+            document.body.classList.remove('mode-move', 'mode-racer', 'mode-signal');
+
+            if (mode === 'click') {
+                segSlider.style.transform = 'translateX(0)';
+                modeBadge.textContent = 'CLICK TEST MODE';
+                modeTitle.textContent = '反射神経ゲーム';
+                modeDesc.innerHTML = 'ランダムに現れる円を素早くタップ！<br>制限時間は30秒間です。';
+            } else if (mode === 'move') {
+                segSlider.style.transform = 'translateX(100%)';
+                document.body.classList.add('mode-move');
+                modeBadge.textContent = 'LANE EVASION MODE';
+                modeTitle.textContent = 'ブロック回避ゲーム';
+                modeDesc.innerHTML = 'Q W E R U I O P キーで隙間に潜り込め！<br>迫り来るブロックを何列よけられるか？';
+            } else if (mode === 'racer') {
+                segSlider.style.transform = 'translateX(200%)';
+                document.body.classList.add('mode-racer');
+                modeBadge.textContent = 'RACER CATCH MODE';
+                modeTitle.textContent = 'レーサー反射テスト';
+                modeDesc.innerHTML = 'Fキー（左）と Jキー（右）で落ちるボールを即座にキャッチ！<br>片方落下の両押し・お手つきは即失格ペナルティ！';
+            } else if (mode === 'signal') {
+                segSlider.style.transform = 'translateX(300%)';
+                document.body.classList.add('mode-signal');
+                modeBadge.textContent = 'SIGNAL START MODE';
+                modeTitle.textContent = 'シグナル反射テスト';
+                modeDesc.innerHTML = '三眼シグナルが順に点灯後、消灯した瞬間にSPACEキー（またはタップ）！<br>消灯前のフライングは即失格ペナルティ！';
+            }
+
+            postModeToSite();
+        }
+
+        segClickBtn.addEventListener('click', () => switchGameMode('click'));
+        segMoveBtn.addEventListener('click', () => switchGameMode('move'));
+        segRacerBtn.addEventListener('click', () => switchGameMode('racer'));
+        if (segSignalBtn) segSignalBtn.addEventListener('click', () => switchGameMode('signal'));
+
+        rankBtn.addEventListener('click', () => {
+            // 埋め込み時のランキングはサイト側に表示するため、ゲーム内のランキング画面は使わない
+            if (isCountingDown || isGameActive || IS_EMBEDDED) return;
+            playClickSound();
+            updateRankingTable();
+            showScreen('ranking-screen');
+        });
+
+        backToStartBtn.addEventListener('click', () => {
+            playClickSound();
+            rankingRequestSeq++;
+            showScreen('start-screen');
+        });
+
+        /* ゲーム開始ハンドラ（多重実行防止・入力欄フォーカス解除） */
+        let activeSitePlayer = null;
+        function handleStartGame() {
+            if (isCountingDown || isGameActive) return;
+
+            // サイトモードでは名前入力欄を使わず、サイトのプレイヤー名で記録する
+            const sitePlayer = getSitePlayer();
+            const name = sitePlayer
+                ? sitePlayer.name
+                : playerNameInput.value.replace(NAME_STRIP_RE, '').trim().slice(0, 10);
+            if (!name) {
+                nameError.textContent = '名前を入力してください';
+                return;
+            }
+            if (isOnlineRankingEnabled() && NAME_FORBIDDEN_LEAD_RE.test(name)) {
+                nameError.textContent = '名前の先頭に = + - @ は使えません';
+                return;
+            }
+            nameError.textContent = '';
+            currentTournamentName = name;
+            activeSitePlayer = sitePlayer;
+            playerNameInput.blur(); // モバイルキーボードを確実に閉じる
+
+            playClickSound();
+            showScreen('countdown-screen');
+            startCountdown();
+        }
+
+        startBtn.addEventListener('click', handleStartGame);
+
+        /* オンライン時、入力中の名前に対応するタグ（この端末で過去に使った名前の場合）を案内 */
+        const nameHint = document.getElementById('name-hint');
+        const DEFAULT_NAME_HINT = nameHint ? nameHint.textContent : '';
+        function updateNameHint() {
+            if (!nameHint) return;
+
+            // サイトモード：名前入力欄を隠し、サイトの「名前#タグ」で記録されることを案内
+            const sitePlayer = getSitePlayer();
+            document.body.classList.toggle('site-mode', !!sitePlayer);
+            if (sitePlayer) {
+                nameError.textContent = '';
+                nameHint.textContent = `※ ${sitePlayer.name}${sitePlayer.tag ? '#' + sitePlayer.tag : ''} として記録されます`;
+                return;
+            }
+            if (!isOnlineRankingEnabled()) {
+                nameHint.textContent = DEFAULT_NAME_HINT;
+                return;
+            }
+            const name = playerNameInput.value.replace(NAME_STRIP_RE, '').trim().slice(0, 10);
+            const profile = getProfile(name);
+            nameHint.textContent = (profile && profile.tag)
+                ? `※ ${name}#${profile.tag} として記録されます（自己ベストを更新）`
+                : '※ この端末で同じ名前を使うと自己ベストが更新されます';
+        }
+        playerNameInput.addEventListener('input', updateNameHint);
+
+        playerNameInput.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            // IME変換確定のEnter（SafariはkeyCode 229）と長押しでは開始しない
+            if (e.isComposing || e.keyCode === 229 || e.repeat) return;
+            e.preventDefault();
+            handleStartGame();
+        });
+
+        /* スタート画面でEnterキーによる開始を許可するフォーカス要素か判定 */
+        function shouldTriggerStartOnEnter(activeEl) {
+            if (!activeEl) return true;
+            if (activeEl === playerNameInput) return false;
+            if (activeEl.tagName === 'BUTTON' && activeEl !== startBtn && !activeEl.classList.contains('segmented-btn')) {
+                return false;
+            }
+            return true;
+        }
+
+        /* スタート画面表示中のEnterキーによるゲーム開始（名前入力欄フォーカス外・モード切替後でも対応） */
+        window.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' || e.isComposing || e.repeat) return;
+            if (isCountingDown || isGameActive) return;
+
+            const startScreen = document.getElementById('start-screen');
+            if (!startScreen || !startScreen.classList.contains('active')) return;
+
+            const activeEl = document.activeElement;
+            if (!shouldTriggerStartOnEnter(activeEl)) return;
+
+            e.preventDefault();
+            if (activeEl && activeEl.classList.contains('segmented-btn')) {
+                activeEl.blur();
+            }
+            handleStartGame();
+        });
+
+        /* リザルト画面表示中のEnter / Spaceキーによる次画面への進行 */
+        let resultShownAt = 0;
+        function handleResultScreenKeydown(e) {
+            const isEnter = (e.key === 'Enter');
+            const isSpace = (e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar');
+            if ((!isEnter && !isSpace) || e.isComposing || e.repeat || e.defaultPrevented) return;
+            if (isCountingDown || isGameActive) return;
+
+            const resultScreen = document.getElementById('result-screen');
+            if (!resultScreen || !resultScreen.classList.contains('active')) return;
+
+            // リザルト表示直後は、ゲーム中の連打で即スキップされないよう入力を無視
+            if (performance.now() - resultShownAt < 600) {
+                e.preventDefault();
+                return;
+            }
+
+            const activeEl = document.activeElement;
+            if (activeEl && activeEl.tagName === 'BUTTON' && activeEl !== restartBtn) return;
+
+            e.preventDefault();
+            if (activeEl === restartBtn) {
+                restartBtn.blur();
+            }
+            restartBtn.click();
+        }
+
+        window.addEventListener('keydown', handleResultScreenKeydown);
+
+        restartBtn.addEventListener('click', () => {
+            cleanupAllTimers();
+            isCountingDown = false;
+            isGameActive = false;
+            resultRequestSeq++;
+            playClickSound();
+            showScreen('start-screen');
+            updateNameHint();
+        });
+
+        /* ==========================================================
+           カウントダウン処理（多重起動完全防止）
+        ========================================================== */
+        let countIntervalTimer = null;
+        function startCountdown() {
+            isCountingDown = true;
+            isGameActive = false;
+            cleanupAllTimers();
+
+            let count = 3;
+            countdownText.textContent = count;
+            playCountSound();
+
+            countIntervalTimer = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownText.textContent = count;
+                    countdownText.style.animation = 'none';
+                    void countdownText.offsetWidth;
+                    countdownText.style.animation = 'pulseCount 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+                    playCountSound();
+                } else {
+                    clearInterval(countIntervalTimer);
+                    countIntervalTimer = null;
+                    isCountingDown = false;
+                    isGameActive = true;
+
+                    if (currentGameMode === 'click') {
+                        startClickGame();
+                    } else if (currentGameMode === 'move') {
+                        startMoveGame();
+                    } else if (currentGameMode === 'racer') {
+                        startRacerGame();
+                    } else if (currentGameMode === 'signal') {
+                        startF1Game();
+                    }
+                }
+            }, 1000);
+        }
+
+        /* ==========================================================
+           1. CLICK ゲーム処理
+        ========================================================== */
+        function startClickGame() {
+            showScreen('game-screen');
+            score = 0;
+            timeLeft = 30;
+
+            document.getElementById('hud-time-label').textContent = 'TIME REMAINING';
+            document.getElementById('hud-score-label').textContent = 'SCORE';
+            document.getElementById('hud-unit').textContent = 's';
+            timeBarBox.style.display = 'block';
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('time-left').textContent = timeLeft;
+            // 前回終了時の0%から伸びるアニメーションを見せないため、一時的にtransitionを無効化
+            timeProgress.style.transition = 'none';
+            timeProgress.style.width = '100%';
+            void timeProgress.offsetWidth;
+            timeProgress.style.transition = '';
+
+            moveStage.style.display = 'none';
+            racerStage.style.display = 'none';
+            targetCircle.style.display = 'block';
+            spawnCircle();
+
+            if (gameTimer) clearInterval(gameTimer);
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time-left').textContent = timeLeft;
+                const pct = (timeLeft / 30) * 100;
+                timeProgress.style.width = `${pct}%`;
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function spawnCircle() {
+            const areaWidth = playArea.clientWidth || 300;
+            const areaHeight = playArea.clientHeight || 400;
+            const circleSize = 64;
+
+            const minX = areaWidth * 0.15;
+            const maxX = Math.max(minX, areaWidth * 0.85 - circleSize);
+            const minY = areaHeight * 0.15;
+            const maxY = Math.max(minY, areaHeight * 0.85 - circleSize);
+
+            const randomX = Math.floor(minX + Math.random() * (maxX - minX));
+            const randomY = Math.floor(minY + Math.random() * (maxY - minY));
+
+            targetCircle.style.left = `${randomX}px`;
+            targetCircle.style.top = `${randomY}px`;
+        }
+
+        function createHitParticles(x, y) {
+            for (let i = 0; i < 6; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'hit-particle';
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                const angle = (Math.PI * 2 * i) / 6;
+                const dist = 20 + Math.random() * 15;
+                particle.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+                particle.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
+                playArea.appendChild(particle);
+                setTimeout(() => particle.remove(), 300);
+            }
+        }
+
+        targetCircle.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0) return;
+            if (!isGameActive || currentGameMode !== 'click') return;
+            playHitSound();
+            score++;
+            document.getElementById('score').textContent = score;
+
+            const circleRect = targetCircle.getBoundingClientRect();
+            const areaRect = playArea.getBoundingClientRect();
+            createHitParticles(circleRect.left - areaRect.left + 32, circleRect.top - areaRect.top + 32);
+            spawnCircle();
+        });
+
+        /* ==========================================================
+           2. MOVE ゲーム処理
+        ========================================================== */
+        /* 物理キー位置（e.code）で判定：キー配列・IME状態に依存しない */
+        const KEY_MAP = {
+            KeyQ: 0, KeyW: 1, KeyE: 2, KeyR: 3,
+            KeyU: 4, KeyI: 5, KeyO: 6, KeyP: 7
+        };
+        const GAME_KEY_CODES = new Set([...Object.keys(KEY_MAP), 'KeyF', 'KeyJ', 'Space']);
+
+        let movePlayerLane = 3;
+        let moveAnimFrame = null;
+        let moveCrashTimer = null;
+        let obstacles = [];
+        let moveSpeed = 220;
+        let lastFrameTime = 0;
+        let isMoveGameOver = false;
+
+        function setPlayerLane(lane) {
+            if (lane < 0 || lane > 7 || !isGameActive || isMoveGameOver) return;
+            movePlayerLane = lane;
+            playMoveSound();
+            updatePlayerPosition();
+
+            keyGuides.forEach((cap, idx) => {
+                if (idx === lane) {
+                    cap.classList.add('pressed');
+                    setTimeout(() => cap.classList.remove('pressed'), 120);
+                }
+            });
+        }
+
+        function updatePlayerPosition() {
+            const areaWidth = playArea.clientWidth || 300;
+            const laneWidth = areaWidth / 8;
+            const playerX = laneWidth * movePlayerLane + (laneWidth - 36) / 2;
+            movePlayer.style.left = `${playerX}px`;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+            if (!isGameActive) return;
+
+            const gameScreen = document.getElementById('game-screen');
+            if (!gameScreen || !gameScreen.classList.contains('active')) return;
+
+            // 長押しの連続発火は無視（スクロール等の既定動作だけ抑止）
+            if (e.repeat) {
+                if (GAME_KEY_CODES.has(e.code)) e.preventDefault();
+                return;
+            }
+
+            if (currentGameMode === 'move') {
+                if (e.code in KEY_MAP) {
+                    e.preventDefault();
+                    setPlayerLane(KEY_MAP[e.code]);
+                }
+            } else if (currentGameMode === 'racer') {
+                if (e.code === 'KeyF' || e.code === 'KeyJ') {
+                    e.preventDefault();
+                    triggerRacerCatch(e.code === 'KeyF' ? 'f' : 'j', e.timeStamp);
+                }
+            } else if (currentGameMode === 'signal') {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    triggerF1Action(e.timeStamp);
+                }
+            }
+        });
+
+        keyGuides.forEach(cap => {
+            cap.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                if (e.button !== 0) return;
+                const lane = parseInt(cap.dataset.lane, 10);
+                setPlayerLane(lane);
+            });
+        });
+
+        function startMoveGame() {
+            showScreen('game-screen');
+            score = 0;
+            isMoveGameOver = false;
+            obstacles = [];
+            moveSpeed = 230;
+
+            document.getElementById('hud-time-label').textContent = 'SPEED LEVEL';
+            document.getElementById('hud-score-label').textContent = 'CLEARED';
+            document.getElementById('hud-unit').textContent = 'px/s';
+            timeBarBox.style.display = 'none';
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('time-left').textContent = Math.floor(moveSpeed);
+
+            targetCircle.style.display = 'none';
+            racerStage.style.display = 'none';
+            moveStage.style.display = 'block';
+
+            document.querySelectorAll('.obstacle-row').forEach(el => el.remove());
+
+            setPlayerLane(3);
+            updatePlayerPosition();
+            spawnObstacleRow(-40);
+
+            lastFrameTime = performance.now();
+            if (moveAnimFrame) cancelAnimationFrame(moveAnimFrame);
+            moveAnimFrame = requestAnimationFrame(moveGameLoop);
+        }
+
+        function spawnObstacleRow(yPos) {
+            const holeLane = Math.floor(Math.random() * 8);
+            const rowEl = document.createElement('div');
+            rowEl.className = 'obstacle-row';
+            rowEl.style.top = `${yPos}px`;
+
+            for (let i = 0; i < 8; i++) {
+                const block = document.createElement('div');
+                block.className = (i === holeLane) ? 'obstacle-block hole' : 'obstacle-block';
+                rowEl.appendChild(block);
+            }
+
+            playArea.appendChild(rowEl);
+            obstacles.push({
+                y: yPos,
+                holeLane: holeLane,
+                element: rowEl,
+                passed: false
+            });
+        }
+
+        function moveGameLoop(now) {
+            if (isMoveGameOver || !isGameActive) return;
+            // rAFのタイムスタンプは直前のperformance.now()より小さいことがあるため下限0で保護
+            const dt = Math.max(0, Math.min((now - lastFrameTime) / 1000, 0.1));
+            lastFrameTime = now;
+
+            const areaHeight = playArea.clientHeight || 400;
+            const judgeY = areaHeight - 84;
+            const winTop = judgeY - 14;
+            const winBottom = judgeY + 24;
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                const prevY = obs.y;
+                obs.y += moveSpeed * dt;
+                obs.element.style.top = `${obs.y}px`;
+
+                // 前フレームと今フレームの間で判定窓と重なったか（高速時のすり抜け防止）
+                const crossedWindow = (obs.y >= winTop) && (prevY <= winBottom);
+                if (!obs.passed && crossedWindow && movePlayerLane !== obs.holeLane) {
+                    handleMoveCrash();
+                    return;
+                }
+
+                if (!obs.passed && obs.y > judgeY + 24) {
+                    obs.passed = true;
+                    score++;
+                    playPassSound();
+                    document.getElementById('score').textContent = score;
+                    moveSpeed += 8;
+                    document.getElementById('time-left').textContent = Math.floor(moveSpeed);
+                }
+
+                if (obs.y > areaHeight + 50) {
+                    obs.element.remove();
+                    obstacles.splice(i, 1);
+                }
+            }
+
+            const spawnInterval = 195;
+            const topMostY = (obstacles.length > 0) ? obstacles[obstacles.length - 1].y : 0;
+            if (topMostY > -30) {
+                spawnObstacleRow(topMostY - spawnInterval);
+            }
+
+            moveAnimFrame = requestAnimationFrame(moveGameLoop);
+        }
+
+        function handleMoveCrash() {
+            isMoveGameOver = true;
+            if (moveAnimFrame) cancelAnimationFrame(moveAnimFrame);
+            playCrashSound();
+
+            playArea.classList.add('shake');
+            setTimeout(() => playArea.classList.remove('shake'), 300);
+
+            if (moveCrashTimer) clearTimeout(moveCrashTimer);
+            moveCrashTimer = setTimeout(() => {
+                moveCrashTimer = null;
+                if (!isGameActive) return;
+                document.querySelectorAll('.obstacle-row').forEach(el => el.remove());
+                endGame();
+            }, 500);
+        }
+
+        /* ==========================================================
+           3. RACER ゲーム処理（空気抵抗・重力演算完全保持）
+        ========================================================== */
+        const RACER_GRAVITY = 2750;
+        const RACER_AIR_DRAG = 0.00038;
+
+        let racerCurrentRound = 0;
+        const RACER_TOTAL_ROUNDS = 5;
+        let racerState = 'idle';
+        let racerDropStartTime = 0;
+        let racerDropTimer = null;
+        let racerPhysicsAnim = null;
+        let racerLastTime = 0;
+        let racerRoundResolvedTimer = null;
+        let racerPenaltyActive = false;
+        // 当該ラウンドで加算した内容（決着後のペナルティで巻き戻すために記録）
+        let racerAddedScoreThisRound = 0;
+        let racerAddedSuccessThisRound = 0;
+        let racerAddedTimesThisRound = 0;
+
+        const racerBalls = {
+            left: { active: false, y: 60, velocity: 0, caught: false, catchTime: null, slow: false, element: racerBallLeft },
+            right: { active: false, y: 60, velocity: 0, caught: false, catchTime: null, slow: false, element: racerBallRight }
+        };
+
+        let racerReactionTimes = [];
+        // ラウンドごとの記録（オンラインランキングでサーバーがスコアを再計算するために送信）
+        let racerRoundLog = [];
+        let racerSuccessCount = 0;
+        let racerTotalDropsCount = 0;
+
+        function resetRacerBalls() {
+            const areaWidth = playArea.clientWidth || 300;
+            const leftX = areaWidth * 0.28 - 29;
+            const rightX = areaWidth * 0.72 - 29;
+
+            racerBallLeft.style.left = `${leftX}px`;
+            racerBallRight.style.left = `${rightX}px`;
+
+            ['left', 'right'].forEach(side => {
+                const b = racerBalls[side];
+                b.active = false;
+                b.y = 60;
+                b.velocity = 0;
+                b.caught = false;
+                b.catchTime = null;
+                b.slow = false;
+                b.element.style.top = `${b.y}px`;
+                b.element.classList.remove('caught', 'faulted');
+                b.element.style.opacity = '1';
+            });
+
+            racerPenaltyActive = false;
+            racerAddedScoreThisRound = 0;
+            racerAddedSuccessThisRound = 0;
+            racerAddedTimesThisRound = 0;
+        }
+
+        function showRacerFeedback(mainText, subText = '', type = '') {
+            racerFeedback.textContent = '';
+            const mainDiv = document.createElement('div');
+            mainDiv.className = 'feedback-main';
+            mainDiv.textContent = mainText;
+            racerFeedback.appendChild(mainDiv);
+
+            if (subText) {
+                const subDiv = document.createElement('div');
+                subDiv.className = 'feedback-sub';
+                subDiv.textContent = subText;
+                racerFeedback.appendChild(subDiv);
+            }
+            racerFeedback.className = type ? `active ${type}` : 'active';
+        }
+
+        function hideRacerFeedback() {
+            racerFeedback.className = '';
+        }
+
+        function startRacerGame() {
+            showScreen('game-screen');
+            score = 0;
+            racerCurrentRound = 0;
+            racerSuccessCount = 0;
+            racerTotalDropsCount = 0;
+            racerReactionTimes = [];
+            racerRoundLog = [];
+
+            document.getElementById('hud-time-label').textContent = 'TRIAL';
+            document.getElementById('hud-score-label').textContent = 'SCORE';
+            document.getElementById('hud-unit').textContent = '';
+            timeBarBox.style.display = 'none';
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('time-left').textContent = `1 / ${RACER_TOTAL_ROUNDS}`;
+
+            targetCircle.style.display = 'none';
+            moveStage.style.display = 'none';
+            racerStage.style.display = 'block';
+
+            prepareNextRacerRound();
+        }
+
+        function prepareNextRacerRound() {
+            if (racerCurrentRound >= RACER_TOTAL_ROUNDS || !isGameActive) {
+                endGame();
+                return;
+            }
+
+            racerCurrentRound++;
+            document.getElementById('time-left').textContent = `${racerCurrentRound} / ${RACER_TOTAL_ROUNDS}`;
+            resetRacerBalls();
+            showRacerFeedback('READY...', '', '');
+
+            racerState = 'waiting';
+
+            const randomDelay = 1400 + Math.random() * 1800;
+            if (racerDropTimer) clearTimeout(racerDropTimer);
+            racerDropTimer = setTimeout(triggerBallDrop, randomDelay);
+        }
+
+        /* タブ非表示でラウンドが不正になるのを防ぐため、進行中ラウンドを取り消す */
+        function suspendRacerRound() {
+            if (racerState !== 'waiting' && racerState !== 'falling') return;
+            if (racerState === 'falling') {
+                racerTotalDropsCount -= (racerBalls.left.active ? 1 : 0) + (racerBalls.right.active ? 1 : 0);
+            }
+            if (racerPhysicsAnim) { cancelAnimationFrame(racerPhysicsAnim); racerPhysicsAnim = null; }
+            if (racerDropTimer) { clearTimeout(racerDropTimer); racerDropTimer = null; }
+            racerCurrentRound--;
+            racerState = 'suspended';
+        }
+
+        function triggerBallDrop() {
+            if (racerState !== 'waiting' || !isGameActive) return;
+            if (document.hidden) {
+                suspendRacerRound();
+                return;
+            }
+
+            racerState = 'falling';
+            hideRacerFeedback();
+
+            const patternRand = Math.random();
+            if (patternRand < 0.35) {
+                racerBalls.left.active = true;
+                racerBalls.right.active = false;
+                racerTotalDropsCount += 1;
+            } else if (patternRand < 0.70) {
+                racerBalls.left.active = false;
+                racerBalls.right.active = true;
+                racerTotalDropsCount += 1;
+            } else {
+                racerBalls.left.active = true;
+                racerBalls.right.active = true;
+                racerTotalDropsCount += 2;
+            }
+
+            // 計測起点は、ボールが実際に動き始める最初のrAFフレームで確定する
+            racerDropStartTime = 0;
+            racerLastTime = performance.now();
+
+            playDropSound();
+
+            if (racerPhysicsAnim) cancelAnimationFrame(racerPhysicsAnim);
+            racerPhysicsAnim = requestAnimationFrame(racerPhysicsLoop);
+        }
+
+        function racerPhysicsLoop(now) {
+            if (racerState !== 'falling' || !isGameActive) return;
+
+            if (!racerDropStartTime) {
+                racerDropStartTime = now;
+                racerLastTime = now;
+            }
+            const dt = Math.max(0, Math.min((now - racerLastTime) / 1000, 0.05));
+            racerLastTime = now;
+            const areaHeight = playArea.clientHeight || 400;
+
+            ['left', 'right'].forEach(side => {
+                const b = racerBalls[side];
+                if (!b.active || b.caught || b.slow) return;
+
+                const airDrag = RACER_AIR_DRAG * b.velocity * Math.abs(b.velocity);
+                const acceleration = RACER_GRAVITY - airDrag;
+
+                b.velocity += acceleration * dt;
+                b.y += b.velocity * dt;
+                b.element.style.top = `${b.y}px`;
+
+                if (b.y > areaHeight - 20) {
+                    b.slow = true;
+                    b.element.style.opacity = '0';
+                }
+            });
+
+            const activeBalls = Object.values(racerBalls).filter(b => b.active);
+            const allResolved = activeBalls.every(b => b.caught || b.slow);
+
+            if (allResolved) {
+                handleRacerRoundResolved();
+                return;
+            }
+
+            racerPhysicsAnim = requestAnimationFrame(racerPhysicsLoop);
+        }
+
+        function handleRacerRoundResolved() {
+            if (racerPenaltyActive || !isGameActive) return;
+            racerState = 'resolved';
+            if (racerPhysicsAnim) cancelAnimationFrame(racerPhysicsAnim);
+
+            const isDoubleDrop = (racerBalls.left.active && racerBalls.right.active);
+            const leftSuccess = (racerBalls.left.active && racerBalls.left.caught);
+            const rightSuccess = (racerBalls.right.active && racerBalls.right.caught);
+
+            if (isDoubleDrop) {
+                if (leftSuccess && rightSuccess) {
+                    playDoubleCatchSound();
+                    const tL = racerBalls.left.catchTime;
+                    const tR = racerBalls.right.catchTime;
+                    racerReactionTimes.push(tL, tR);
+                    racerSuccessCount += 2;
+
+                    const scoreL = calcReactionScore(tL);
+                    const scoreR = calcReactionScore(tR);
+                    const added = calcDoubleDropAverageScore(scoreL, scoreR);
+                    score += added;
+                    racerAddedScoreThisRound = added;
+                    racerAddedSuccessThisRound = 2;
+                    racerAddedTimesThisRound = 2;
+                    document.getElementById('score').textContent = score;
+
+                    showRacerFeedback('DOUBLE CATCH!', `L: ${tL}ms | R: ${tR}ms`, 'double-catch');
+                } else if (leftSuccess || rightSuccess) {
+                    playSlowSound();
+                    const successBall = leftSuccess ? racerBalls.left : racerBalls.right;
+                    const t = successBall.catchTime;
+                    racerReactionTimes.push(t);
+                    racerSuccessCount += 1;
+
+                    const singleScore = calcReactionScore(t);
+                    const added = calcDoubleDropAverageScore(singleScore, 0);
+                    score += added;
+                    racerAddedScoreThisRound = added;
+                    racerAddedSuccessThisRound = 1;
+                    racerAddedTimesThisRound = 1;
+                    document.getElementById('score').textContent = score;
+
+                    showRacerFeedback('1 CATCH / 1 SLOW', `TIME: ${t}ms`, 'split');
+                } else {
+                    playSlowSound();
+                    playArea.classList.add('shake');
+                    setTimeout(() => playArea.classList.remove('shake'), 300);
+                    showRacerFeedback('SLOW!', '', 'slow');
+                }
+            } else {
+                const targetBall = racerBalls.left.active ? racerBalls.left : racerBalls.right;
+                if (targetBall.caught) {
+                    const t = targetBall.catchTime;
+                    racerReactionTimes.push(t);
+                    racerSuccessCount += 1;
+
+                    const singleScore = calcReactionScore(t);
+                    score += singleScore;
+                    racerAddedScoreThisRound = singleScore;
+                    racerAddedSuccessThisRound = 1;
+                    racerAddedTimesThisRound = 1;
+                    document.getElementById('score').textContent = score;
+
+                    showRacerFeedback('CATCH!', `${t} ms`, 'catch');
+                } else {
+                    playSlowSound();
+                    playArea.classList.add('shake');
+                    setTimeout(() => playArea.classList.remove('shake'), 300);
+                    showRacerFeedback('SLOW!', '', 'slow');
+                }
+            }
+
+            racerRoundLog.push({
+                drops: isDoubleDrop ? 2 : 1,
+                times: [racerBalls.left, racerBalls.right].filter(b => b.active && b.caught).map(b => b.catchTime),
+                penalty: false
+            });
+
+            if (racerRoundResolvedTimer) clearTimeout(racerRoundResolvedTimer);
+            racerRoundResolvedTimer = setTimeout(() => {
+                hideRacerFeedback();
+                prepareNextRacerRound();
+            }, 1200);
+        }
+
+        function triggerRacerPenalty(reasonText, subReason = '') {
+            // 決着後のペナルティは記録済みのラウンドを0点に、決着前は新しいラウンドとして記録
+            if (racerState === 'resolved' && racerRoundLog.length > 0) {
+                const lastRound = racerRoundLog[racerRoundLog.length - 1];
+                lastRound.penalty = true;
+                lastRound.times = [];
+            } else {
+                racerRoundLog.push({
+                    drops: (racerBalls.left.active ? 1 : 0) + (racerBalls.right.active ? 1 : 0),
+                    times: [],
+                    penalty: true
+                });
+            }
+
+            racerPenaltyActive = true;
+            racerState = 'resolved';
+
+            if (racerPhysicsAnim) cancelAnimationFrame(racerPhysicsAnim);
+            if (racerDropTimer) clearTimeout(racerDropTimer);
+            if (racerRoundResolvedTimer) clearTimeout(racerRoundResolvedTimer);
+
+            // 決着後に出たペナルティ：当該ラウンドの得点・成功数・反応時間を取り消す
+            if (racerAddedScoreThisRound > 0 || racerAddedSuccessThisRound > 0) {
+                score -= racerAddedScoreThisRound;
+                racerSuccessCount -= racerAddedSuccessThisRound;
+                if (racerAddedTimesThisRound > 0) {
+                    racerReactionTimes.splice(-racerAddedTimesThisRound, racerAddedTimesThisRound);
+                }
+                document.getElementById('score').textContent = score;
+                racerAddedScoreThisRound = 0;
+                racerAddedSuccessThisRound = 0;
+                racerAddedTimesThisRound = 0;
+            }
+
+            ['left', 'right'].forEach(side => {
+                const b = racerBalls[side];
+                if (b.caught) {
+                    b.caught = false;
+                    b.element.classList.remove('caught');
+                    b.element.classList.add('faulted');
+                }
+            });
+
+            playPenaltySound();
+            playArea.classList.add('shake');
+            setTimeout(() => playArea.classList.remove('shake'), 300);
+
+            showRacerFeedback(reasonText, subReason, 'fault');
+
+            racerRoundResolvedTimer = setTimeout(() => {
+                hideRacerFeedback();
+                prepareNextRacerRound();
+            }, 1300);
+        }
+
+        function calcReactionScore(reactionTime) {
+            if (reactionTime <= 200) return 10;
+            if (reactionTime <= 240) return 9;
+            if (reactionTime <= 280) return 8;
+            if (reactionTime <= 330) return 7;
+            if (reactionTime <= 380) return 6;
+            if (reactionTime <= 430) return 5;
+            if (reactionTime <= 480) return 4;
+            return 3;
+        }
+
+        function calcDoubleDropAverageScore(scoreL, scoreR) {
+            return Math.round((scoreL + scoreR) / 2);
+        }
+
+        function triggerRacerCatch(key, eventTime = performance.now()) {
+            if (racerPenaltyActive || !isGameActive) return;
+
+            const btn = (key === 'f') ? racerBtnLeft : racerBtnRight;
+            btn.classList.add('pressed');
+            setTimeout(() => btn.classList.remove('pressed'), 120);
+
+            if (racerState === 'waiting') {
+                triggerRacerPenalty('FAULT!', '早すぎ');
+                return;
+            }
+
+            if (racerState === 'falling' || racerState === 'resolved') {
+                const isDoubleDrop = (racerBalls.left.active && racerBalls.right.active);
+                const targetSide = (key === 'f') ? 'left' : 'right';
+                const targetBall = racerBalls[targetSide];
+
+                if (!isDoubleDrop && !targetBall.active) {
+                    triggerRacerPenalty('PENALTY!', '両押し / お手つき');
+                    return;
+                }
+
+                if (racerState === 'falling') {
+                    // ボールがまだ動き始めていない（最初のフレーム前）入力は計測対象外
+                    if (targetBall.active && !targetBall.caught && !targetBall.slow && racerDropStartTime) {
+                        targetBall.caught = true;
+                        targetBall.catchTime = Math.max(0, Math.round(eventTime - racerDropStartTime));
+                        targetBall.element.classList.add('caught');
+                        playCatchSound();
+
+                        const otherSide = (targetSide === 'left') ? 'right' : 'left';
+                        const otherBall = racerBalls[otherSide];
+                        if (isDoubleDrop && otherBall.active && !otherBall.caught && !otherBall.slow) {
+                            showRacerFeedback(`${targetSide.toUpperCase()} CATCH!`, 'NEXT!', 'catch');
+                        }
+                    }
+                }
+            }
+        }
+
+        [[racerBtnLeft, 'f'], [racerBtnRight, 'j'], [racerBallLeft, 'f'], [racerBallRight, 'j']].forEach(([el, key]) => {
+            el.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                if (e.button !== 0) return;
+                triggerRacerCatch(key, e.timeStamp);
+            });
+        });
+
+        /* ==========================================================
+           4. F1 START ゲーム処理（三眼縦型シグナル & ブラックアウト反応）
+        ========================================================== */
+        let f1State = 'idle'; // idle, breath, step1, step2, step3, lights_out, finished
+        let f1StartTime = 0;
+        let f1ReactionTime = 0;
+        let f1IsFault = false;
+        let f1IsTimeout = false;
+
+        function resetF1Lamps() {
+            [f1Lamp1, f1Lamp2, f1Lamp3].forEach(lamp => {
+                if (lamp) lamp.classList.remove('lit');
+            });
+        }
+
+        function showF1Feedback(mainText, subText = '', type = '') {
+            if (!f1FeedbackMain || !f1FeedbackSub) return;
+            f1FeedbackMain.textContent = mainText;
+            f1FeedbackSub.textContent = subText;
+            f1Feedback.className = type ? `active ${type}` : 'active';
+        }
+
+        function hideF1Feedback() {
+            if (f1Feedback) f1Feedback.className = '';
+        }
+
+        function startF1Game() {
+            showScreen('game-screen');
+            score = 0;
+            f1State = 'breath';
+            f1ReactionTime = 0;
+            f1IsFault = false;
+            f1IsTimeout = false;
+            cleanupF1Timers();
+            resetF1Lamps();
+
+            document.getElementById('hud-time-label').textContent = 'SIGNAL STATUS';
+            document.getElementById('hud-score-label').textContent = 'REACTION';
+            document.getElementById('hud-unit').textContent = '';
+            timeBarBox.style.display = 'none';
+
+            document.getElementById('score').textContent = '--';
+            document.getElementById('time-left').textContent = 'WAIT';
+
+            targetCircle.style.display = 'none';
+            moveStage.style.display = 'none';
+            racerStage.style.display = 'none';
+            if (f1Stage) f1Stage.style.display = 'block';
+
+            showF1Feedback('STANDBY', '一呼吸置いてシグナル点灯...', '');
+
+            // 1. 一呼吸（約1.0秒）置いた後に点灯シークエンス開始
+            const t1 = setTimeout(() => {
+                if (!isGameActive || f1State !== 'breath') return;
+                runF1SignalSequence();
+            }, 1000);
+            f1Timers.push(t1);
+        }
+
+        function runF1SignalSequence() {
+            // 第1眼点灯
+            f1State = 'step1';
+            if (f1Lamp1) f1Lamp1.classList.add('lit');
+            playSignalBeep(650);
+            document.getElementById('time-left').textContent = 'RED 1/3';
+            showF1Feedback('STAY READY', '消灯まで待機...', '');
+
+            const t2 = setTimeout(() => {
+                if (!isGameActive || f1State !== 'step1') return;
+                // 第2眼点灯
+                f1State = 'step2';
+                if (f1Lamp2) f1Lamp2.classList.add('lit');
+                playSignalBeep(650);
+                document.getElementById('time-left').textContent = 'RED 2/3';
+
+                const t3 = setTimeout(() => {
+                    if (!isGameActive || f1State !== 'step2') return;
+                    // 第3眼点灯（三眼すべて点灯）
+                    f1State = 'step3';
+                    if (f1Lamp3) f1Lamp3.classList.add('lit');
+                    playSignalBeep(650);
+                    document.getElementById('time-left').textContent = 'ALL RED';
+                    showF1Feedback('ALL RED', '消灯の瞬間を狙え！', '');
+
+                    // 三眼すべて点灯後、短いランダム秒（1.0秒〜2.5秒）の後に消灯
+                    const randomDelay = 1000 + Math.random() * 1500;
+                    const t4 = setTimeout(() => {
+                        if (!isGameActive || f1State !== 'step3') return;
+                        triggerF1LightsOut();
+                    }, randomDelay);
+                    f1Timers.push(t4);
+                }, 1000);
+                f1Timers.push(t3);
+            }, 1000);
+            f1Timers.push(t2);
+        }
+
+        function triggerF1LightsOut() {
+            f1State = 'lights_out';
+            resetF1Lamps();
+            f1StartTime = performance.now();
+            // 消灯が実際に描画される次フレームを計測起点にする
+            requestAnimationFrame((ts) => {
+                if (f1State === 'lights_out') f1StartTime = ts;
+            });
+            document.getElementById('time-left').textContent = 'GO!';
+            showF1Feedback('LIGHTS OUT!', 'NOW! SPACE!', 'go');
+            playTone(900, 'sine', 0.08, 0.2);
+
+            // タイムアウト監視（3.5秒放置で自動終了）
+            const tTimeout = setTimeout(() => {
+                if (isGameActive && f1State === 'lights_out') {
+                    handleF1Timeout();
+                }
+            }, 3500);
+            f1Timers.push(tTimeout);
+        }
+
+        function triggerF1Action(eventTime = performance.now()) {
+            if (!isGameActive || currentGameMode !== 'signal') return;
+
+            if (f1ActionBtn) {
+                f1ActionBtn.classList.add('pressed');
+                setTimeout(() => f1ActionBtn.classList.remove('pressed'), 120);
+            }
+
+            // 消灯前に押した場合はフライング（ジャンプスタート失格）
+            if (f1State === 'breath' || f1State === 'step1' || f1State === 'step2' || f1State === 'step3') {
+                handleF1JumpStart();
+                return;
+            }
+
+            // 消灯後の正規リアクション
+            if (f1State === 'lights_out') {
+                f1State = 'finished';
+                cleanupF1Timers();
+                f1ReactionTime = Math.max(0, Math.round(eventTime - f1StartTime));
+                f1IsFault = false;
+
+                // スコア計算: 反応が早いほど高得点（最大1000点）
+                score = Math.max(0, 1000 - f1ReactionTime);
+                document.getElementById('score').textContent = score;
+                document.getElementById('time-left').textContent = `${f1ReactionTime} ms`;
+
+                playCatchSound();
+                showF1Feedback(`${f1ReactionTime} ms`, 'START RECORDED!', 'success');
+
+                const tEnd = setTimeout(() => {
+                    endGame();
+                }, 1200);
+                f1Timers.push(tEnd);
+            }
+        }
+
+        function handleF1JumpStart() {
+            f1State = 'finished';
+            f1IsFault = true;
+            f1ReactionTime = null;
+            score = 0;
+            cleanupF1Timers();
+
+            document.getElementById('score').textContent = '0';
+            document.getElementById('time-left').textContent = 'FAULT';
+
+            playPenaltySound();
+            playArea.classList.add('shake');
+            setTimeout(() => playArea.classList.remove('shake'), 300);
+
+            showF1Feedback('FALSE START!', '消灯前のフライング失格', 'fault');
+
+            const tEnd = setTimeout(() => {
+                endGame();
+            }, 1400);
+            f1Timers.push(tEnd);
+        }
+
+        function handleF1Timeout() {
+            f1State = 'finished';
+            f1IsFault = false;
+            f1IsTimeout = true;
+            f1ReactionTime = null;
+            score = 0;
+            cleanupF1Timers();
+
+            document.getElementById('score').textContent = '0';
+            document.getElementById('time-left').textContent = 'SLOW';
+
+            playSlowSound();
+            showF1Feedback('TIMEOUT', 'タイムオーバー', 'slow');
+
+            const tEnd = setTimeout(() => {
+                endGame();
+            }, 1200);
+            f1Timers.push(tEnd);
+        }
+
+        if (f1ActionBtn) {
+            f1ActionBtn.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                if (e.button !== 0) return;
+                triggerF1Action(e.timeStamp);
+            });
+        }
+        if (f1Stage) {
+            f1Stage.addEventListener('pointerdown', (e) => {
+                if (e.button !== 0) return;
+                if (e.target.closest('#f1-action-btn')) return;
+                triggerF1Action(e.timeStamp);
+            });
+        }
+
+        /* ==========================================================
+           タブ非表示時の保護（不正な反応時間・タイムアウトの防止）
+        ========================================================== */
+        document.addEventListener('visibilitychange', () => {
+            if (!isGameActive) return;
+            if (document.hidden) {
+                if (currentGameMode === 'racer') {
+                    suspendRacerRound();
+                } else if (currentGameMode === 'signal' &&
+                           f1State !== 'finished' && f1State !== 'suspended') {
+                    // 試行を無効化して、復帰時にやり直す
+                    cleanupF1Timers();
+                    resetF1Lamps();
+                    f1State = 'suspended';
+                }
+            } else {
+                if (currentGameMode === 'move') {
+                    lastFrameTime = performance.now();
+                } else if (currentGameMode === 'racer' && racerState === 'suspended') {
+                    prepareNextRacerRound();
+                } else if (currentGameMode === 'signal' && f1State === 'suspended') {
+                    startF1Game();
+                }
+            }
+        });
+
+        /* ==========================================================
+           リザルト処理
+        ========================================================== */
+        function endGame() {
+            isGameActive = false;
+            cleanupAllTimers();
+
+            targetCircle.style.display = 'none';
+            moveStage.style.display = 'none';
+            racerStage.style.display = 'none';
+            if (f1Stage) f1Stage.style.display = 'none';
+            playEndSound();
+
+            let rankings = getRankings();
+            const existingIndex = rankings.findIndex(r => r.name.toLowerCase() === currentTournamentName.toLowerCase());
+
+            if (existingIndex !== -1) {
+                if (score > rankings[existingIndex].score) {
+                    rankings[existingIndex].score = score;
+                }
+            } else {
+                rankings.push({ name: currentTournamentName, score: score });
+            }
+
+            rankings.sort((a, b) => b.score - a.score);
+            saveRankings(rankings);
+
+            const myRank = rankings.findIndex(r => r.name.toLowerCase() === currentTournamentName.toLowerCase()) + 1;
+
+            animateScoreCount(score);
+
+            const unitMap = { click: 'pts', move: '列', racer: 'pts', signal: 'pts' };
+            document.getElementById('final-unit').textContent = unitMap[currentGameMode] || 'pts';
+            document.getElementById('result-rank').textContent = `順位: ${myRank} 位 / ${rankings.length} 人中`;
+
+            if (currentGameMode === 'racer') {
+                racerStatsRow.style.display = 'flex';
+                if (f1StatsRow) f1StatsRow.style.display = 'none';
+                document.getElementById('racer-stat-catches').textContent = `${racerSuccessCount} / ${racerTotalDropsCount} 個`;
+                if (racerReactionTimes.length > 0) {
+                    const minTime = Math.min(...racerReactionTimes);
+                    const avgTime = Math.round(racerReactionTimes.reduce((a, b) => a + b, 0) / racerReactionTimes.length);
+                    document.getElementById('racer-stat-best').textContent = `${minTime} ms`;
+                    document.getElementById('racer-stat-avg').textContent = `${avgTime} ms`;
+                } else {
+                    document.getElementById('racer-stat-best').textContent = '- ms';
+                    document.getElementById('racer-stat-avg').textContent = '- ms';
+                }
+            } else if (currentGameMode === 'signal') {
+                racerStatsRow.style.display = 'none';
+                if (f1StatsRow) f1StatsRow.style.display = 'flex';
+                if (f1IsFault) {
+                    f1StatTime.textContent = 'FAULT';
+                    f1StatRating.textContent = 'FALSE START';
+                    f1StatRating.style.color = 'var(--danger)';
+                } else if (f1IsTimeout) {
+                    f1StatTime.textContent = 'NO REACTION';
+                    f1StatRating.textContent = 'TIMEOUT';
+                    f1StatRating.style.color = 'var(--warning)';
+                } else if (f1ReactionTime !== null) {
+                    f1StatTime.textContent = `${f1ReactionTime} ms`;
+                    let rating = 'AVERAGE';
+                    let ratingColor = 'var(--text-title)';
+                    if (f1ReactionTime < 190) {
+                        rating = 'F1 CHAMPION';
+                        ratingColor = '#eab308';
+                    } else if (f1ReactionTime < 230) {
+                        rating = 'F1 DRIVER';
+                        ratingColor = '#16a34a';
+                    } else if (f1ReactionTime < 270) {
+                        rating = 'PRO RACER';
+                        ratingColor = '#2563eb';
+                    } else if (f1ReactionTime < 330) {
+                        rating = 'FAST';
+                        ratingColor = 'var(--mode-color)';
+                    }
+                    f1StatRating.textContent = rating;
+                    f1StatRating.style.color = ratingColor;
+                }
+            } else {
+                racerStatsRow.style.display = 'none';
+                if (f1StatsRow) f1StatsRow.style.display = 'none';
+            }
+
+            const allScores = rankings.map(r => r.score);
+            renderHistogram(allScores, score);
+
+            if (isOnlineRankingEnabled()) {
+                reportOnlineResult(`順位: ${myRank} 位 / ${rankings.length} 人中`);
+            } else {
+                postResultToSite(currentGameMode, score, null);
+            }
+
+            const resultContent = document.getElementById('result-content');
+            resultContent.classList.remove('animate-pop');
+            void resultContent.offsetWidth; 
+            resultContent.classList.add('animate-pop');
+
+            resultShownAt = performance.now();
+            showScreen('result-screen');
+        }
+
+        /* オンラインへスコア送信し、順位・ヒストグラムを全体の結果に差し替える。
+           失敗時は端末内の順位に (LOCAL) を付けて表示する */
+        let resultRequestSeq = 0;
+        function reportOnlineResult(localRankText) {
+            const seq = ++resultRequestSeq;
+            const rankEl = document.getElementById('result-rank');
+            const name = currentTournamentName;
+            const mode = currentGameMode;
+            const displayedScore = score;
+            // サイトへの結果通知は1プレイにつき1回（画面を離れていても送る）
+            let siteNotified = false;
+            const notifySite = (online) => {
+                if (siteNotified) return;
+                siteNotified = true;
+                postResultToSite(mode, displayedScore, online);
+            };
+            // サイトモードではサイトのプレイヤー、それ以外は名前ごとのプロフィール
+            const sitePlayer = activeSitePlayer;
+            const profile = sitePlayer || getOrCreateProfile(name);
+            const payload = {
+                action: 'submit',
+                playerId: profile.playerId,
+                secret: profile.secret,
+                name: name,
+                mode: mode,
+                score: score,
+                detail: buildScoreDetail(),
+                version: GAME_VERSION
+            };
+            // サイトモードでは、いまのサイトの名前で送る（プレイ中に名前が変わっていても、サーバーの名前を戻さない）
+            const sendPayload = sitePlayer ? withLatestSiteName(payload) : payload;
+
+            rankEl.textContent = '順位: 集計中...';
+
+            submitScoreOnline(sendPayload)
+                .then(data => {
+                    if (data.ok) {
+                        if (sitePlayer) saveSitePlayerTag(sitePlayer.playerId, data.tag);
+                        else saveProfileTag(name, data.tag);
+                    }
+                    if (data.ok) {
+                        const online = Object.assign({}, data);
+                        delete online.scores;
+                        notifySite(online);
+                    } else {
+                        notifySite({ ok: false, error: String(data.error || 'unknown') });
+                    }
+                    if (seq !== resultRequestSeq) return;
+                    if (data.ok) {
+                        rankEl.textContent = `順位: ${data.rank} 位 / ${data.total} 人中`;
+                        if (Array.isArray(data.scores)) renderHistogram(data.scores, Number(data.score));
+                    } else {
+                        rankEl.textContent = `${localRankText} (LOCAL)`;
+                        console.warn('Online ranking rejected:', data.error);
+                    }
+                })
+                .catch(e => {
+                    notifySite({ ok: false, error: 'network' });
+                    if (seq !== resultRequestSeq) return;
+                    rankEl.textContent = `${localRankText} (LOCAL)`;
+                    console.warn('Online ranking unavailable:', e);
+                });
+        }
+
+        function animateScoreCount(finalScore) {
+            const scoreEl = document.getElementById('final-score');
+            if (scoreAnimTimer) {
+                clearInterval(scoreAnimTimer);
+                scoreAnimTimer = null;
+            }
+            const safeTarget = Math.max(0, Math.floor(Number(finalScore) || 0));
+            if (safeTarget === 0) {
+                scoreEl.textContent = '0';
+                return;
+            }
+            let current = 0;
+            const duration = 400;
+            const stepTime = Math.max(16, duration / safeTarget);
+            const increment = Math.max(1, Math.ceil(safeTarget / (duration / 16)));
+            scoreAnimTimer = setInterval(() => {
+                current += increment;
+                if (current >= safeTarget) {
+                    clearInterval(scoreAnimTimer);
+                    scoreAnimTimer = null;
+                    scoreEl.textContent = safeTarget;
+                } else {
+                    scoreEl.textContent = current;
+                }
+            }, stepTime);
+        }
+
+        /* ==========================================================
+           ヒストグラム（12本固定・刻み幅自動調整・NaN/ゼロ除算/DOM肥大化防止）
+        ========================================================== */
+        const HISTOGRAM_BIN_COUNT = 12;
+
+        function calculateHistogramStep(validScores, safeMyScore, binCount = HISTOGRAM_BIN_COUNT) {
+            const maxScore = Math.max(0, ...validScores, safeMyScore);
+            return Math.max(1, Math.ceil((maxScore + 1) / binCount));
+        }
+
+        function renderHistogram(allScores, myScore) {
+            const container = document.getElementById('histogram-container');
+            container.textContent = '';
+
+            const validScores = allScores.filter(n => typeof n === 'number' && Number.isFinite(n) && n >= 0);
+            const safeMyScore = (typeof myScore === 'number' && Number.isFinite(myScore) && myScore >= 0) ? myScore : 0;
+            const step = calculateHistogramStep(validScores, safeMyScore, HISTOGRAM_BIN_COUNT);
+            const bins = Array(HISTOGRAM_BIN_COUNT).fill(0);
+
+
+            validScores.forEach(s => {
+                const binIdx = Math.min(HISTOGRAM_BIN_COUNT - 1, Math.max(0, Math.floor(s / step)));
+                bins[binIdx]++;
+            });
+
+            const myBinIdx = Math.min(HISTOGRAM_BIN_COUNT - 1, Math.max(0, Math.floor(safeMyScore / step)));
+            const maxCount = Math.max(...bins, 1);
+
+            const header = document.createElement('div');
+            header.className = 'histogram-header';
+            header.innerHTML = `
+                <span>SCORE DISTRIBUTION (${step}刻み)</span>
+                <span style="display: flex; gap: 8px;">
+                    <span style="color: var(--text-dark);">■ 全体</span>
+                    <span style="color: var(--mode-color);">■ 今回の記録</span>
+                </span>
+            `;
+            container.appendChild(header);
+
+            const chart = document.createElement('div');
+            chart.className = 'chart-wrapper';
+
+            bins.forEach((count, idx) => {
+                const col = document.createElement('div');
+                col.className = 'bar-col';
+
+                const isMyBin = (idx === myBinIdx);
+                const countLabel = document.createElement('span');
+                countLabel.className = 'bar-count-label';
+                countLabel.style.color = isMyBin ? 'var(--mode-color)' : 'var(--text-dark)';
+                countLabel.textContent = count;
+
+                const bar = document.createElement('div');
+                bar.className = `bar-pill ${isMyBin ? 'red' : 'blue'}`;
+                const heightPercent = (count / maxCount) * 58;
+                bar.style.height = `${Math.max(heightPercent, 3)}px`;
+
+                const label = document.createElement('span');
+                label.className = 'bar-bottom-label';
+                label.style.color = isMyBin ? 'var(--mode-color)' : 'var(--text-dark)';
+                label.style.fontWeight = isMyBin ? 'bold' : 'normal';
+                label.textContent = `${idx * step}`;
+
+                col.appendChild(countLabel);
+                col.appendChild(bar);
+                col.appendChild(label);
+                chart.appendChild(col);
+            });
+
+            container.appendChild(chart);
+        }
+
+        /* ==========================================================
+           ランキングテーブル更新（XSS・型保護：textContentによる安全なDOM構築）
+        ========================================================== */
+        let rankingRequestSeq = 0;
+
+        function updateRankingTable() {
+            const titleEl = document.getElementById('ranking-title');
+            const baseTitle = `${currentGameMode.toUpperCase()} LEADERBOARD`;
+            titleEl.textContent = baseTitle;
+
+            if (!isOnlineRankingEnabled()) {
+                renderLocalRanking();
+                return;
+            }
+
+            const seq = ++rankingRequestSeq;
+            const mode = currentGameMode;
+            const name = playerNameInput.value.replace(NAME_STRIP_RE, '').trim().slice(0, 10);
+            const profile = getProfile(name);
+            renderRankingMessage('LOADING...');
+
+            callRankingApi('GET', { action: 'leaderboard', mode: mode, playerId: profile ? profile.playerId : '' })
+                .then(data => {
+                    if (seq !== rankingRequestSeq) return;
+                    if (!data.ok || !Array.isArray(data.top)) throw new Error(data.error || 'Invalid response');
+                    renderOnlineRanking(data, profile ? { name: name, tag: profile.tag } : null);
+                })
+                .catch(e => {
+                    if (seq !== rankingRequestSeq) return;
+                    console.warn('Online ranking unavailable:', e);
+                    titleEl.textContent = `${baseTitle} (LOCAL)`;
+                    renderLocalRanking();
+                });
+        }
+
+        function getRankingUnit() {
+            const unitMap = { click: 'pts', move: '列', racer: 'pts', signal: 'pts' };
+            return unitMap[currentGameMode] || 'pts';
+        }
+
+        function renderRankingMessage(text) {
+            const tbody = document.getElementById('ranking-tbody');
+            tbody.textContent = '';
+            const emptyTr = document.createElement('tr');
+            const emptyTd = document.createElement('td');
+            emptyTd.colSpan = 3;
+            emptyTd.style.textAlign = 'center';
+            emptyTd.style.color = 'var(--text-dark)';
+            emptyTd.style.padding = '24px';
+            emptyTd.textContent = text;
+            emptyTr.appendChild(emptyTd);
+            tbody.appendChild(emptyTr);
+        }
+
+        /* rows: { rank, name, tag, score, isMe } の配列（rank は1始まり） */
+        function appendRankingRow(tbody, row, unit) {
+            const tr = document.createElement('tr');
+            const classes = [];
+            if (row.rank === 1) classes.push('rank-gold');
+            else if (row.rank === 2) classes.push('rank-silver');
+            else if (row.rank === 3) classes.push('rank-bronze');
+            if (row.isMe) classes.push('is-me');
+            tr.className = classes.join(' ');
+
+            const medal = (row.rank === 1) ? '1st' : (row.rank === 2) ? '2nd' : (row.rank === 3) ? '3rd' : `${row.rank}`;
+
+            const tdRank = document.createElement('td');
+            tdRank.textContent = medal;
+
+            const tdName = document.createElement('td');
+            tdName.style.textAlign = 'left';
+            tdName.textContent = String(row.name || '');
+            if (row.tag) {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'name-tag';
+                tagSpan.textContent = `#${row.tag}`;
+                tdName.appendChild(tagSpan);
+            }
+
+            const tdScore = document.createElement('td');
+            tdScore.textContent = `${Number(row.score) || 0} ${unit}`;
+
+            tr.appendChild(tdRank);
+            tr.appendChild(tdName);
+            tr.appendChild(tdScore);
+            tbody.appendChild(tr);
+        }
+
+        function renderLocalRanking() {
+            const top10 = getRankings().slice(0, 10);
+            if (top10.length === 0) {
+                renderRankingMessage('NO DATA RECORDED');
+                return;
+            }
+            const tbody = document.getElementById('ranking-tbody');
+            tbody.textContent = '';
+            const unit = getRankingUnit();
+            top10.forEach((r, index) => {
+                appendRankingRow(tbody, { rank: index + 1, name: r.name, tag: '', score: r.score, isMe: false }, unit);
+            });
+        }
+
+        function renderOnlineRanking(data, myProfile) {
+            if (data.top.length === 0) {
+                renderRankingMessage('NO DATA RECORDED');
+                return;
+            }
+            const tbody = document.getElementById('ranking-tbody');
+            tbody.textContent = '';
+            const unit = getRankingUnit();
+            data.top.forEach(r => {
+                appendRankingRow(tbody, {
+                    rank: Math.max(1, Math.floor(Number(r.rank)) || 1),
+                    name: r.name,
+                    tag: r.tag,
+                    score: r.score,
+                    isMe: r.isMe === true
+                }, unit);
+            });
+
+            // 自分が上位に入っていない場合は区切りの下に自分の順位を表示
+            const me = data.me;
+            if (me && myProfile && !data.top.some(r => r.isMe === true)) {
+                const gapTr = document.createElement('tr');
+                gapTr.className = 'ranking-gap';
+                const gapTd = document.createElement('td');
+                gapTd.className = 'gap-cell';
+                gapTd.colSpan = 3;
+                gapTd.textContent = '⋮';
+                gapTr.appendChild(gapTd);
+                tbody.appendChild(gapTr);
+
+                appendRankingRow(tbody, {
+                    rank: Math.max(1, Math.floor(Number(me.rank)) || 1),
+                    name: myProfile.name,
+                    tag: myProfile.tag,
+                    score: me.score,
+                    isMe: true
+                }, unit);
+            }
+        }
+
+        /* オンラインランキング初期化：名前欄の案内と、前回送れなかったスコアの再送 */
+        updateNameHint();
+        if (isOnlineRankingEnabled()) {
+            flushPendingScores();
+        }
+
+        /* 埋め込み時：ゲーム内のランキングを隠し、いまのモードをサイトに知らせる。
+           サイト側で名前が変わったら（別ページでの変更も storage イベントで届く）案内を更新する */
+        document.body.classList.toggle('embedded', IS_EMBEDDED);
+        postModeToSite();
+        window.addEventListener('storage', (e) => {
+            if (e.key === SITE_PLAYER_STORAGE_KEY || e.key === null) updateNameHint();
+        });
+
+        /* 画面回転・リサイズ時のレイアウト自己修復 */
+        window.addEventListener('resize', () => {
+            if (isGameActive && currentGameMode === 'move') {
+                updatePlayerPosition();
+            } else if (isGameActive && currentGameMode === 'racer' && racerState === 'waiting') {
+                resetRacerBalls();
+            }
+        });
+    </script>
+</body>
+</html>

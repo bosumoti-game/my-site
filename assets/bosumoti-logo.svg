@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -56 120 118" width="44" height="44" aria-hidden="true">
+  <!-- ヘッダー用。小さく表示しても潰れないよう、線を太く、細部を省いている -->
+  <ellipse cx="-29" cy="45" rx="9" ry="6" fill="#FFFFFF" stroke="#3A2E26" stroke-width="3"/>
+  <ellipse cx="29" cy="45" rx="9" ry="6" fill="#FFFFFF" stroke="#3A2E26" stroke-width="3"/>
+  <path d="M-18 -34 Q-28 -52 -44 -42 Q-50 -28 -40 -20 Z" fill="#FFFFFF" stroke="#3A2E26" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M18 -34 Q28 -52 44 -42 Q50 -28 40 -20 Z" fill="#FFFFFF" stroke="#3A2E26" stroke-width="3" stroke-linejoin="round"/>
+  <ellipse cx="0" cy="6" rx="52" ry="43" fill="#FFFFFF" stroke="#3A2E26" stroke-width="3"/>
+  <ellipse cx="0" cy="11" rx="14" ry="9.5" fill="#FFFFFF" stroke="#3A2E26" stroke-width="2.2"/>
+  <circle cx="-14" cy="-4" r="6" fill="#2A211B"/>
+  <circle cx="14" cy="-4" r="6" fill="#2A211B"/>
+  <ellipse cx="0" cy="7" rx="4.5" ry="3" fill="#2A211B"/>
+</svg>

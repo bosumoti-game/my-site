@@ -1,0 +1,112 @@
+/*
+  bosumoti-game デザイントークン
+  色・フォント・動きはここの変数だけを使う。新しい値を足すときは先に相談する。
+  テーマ：最初は prefers-color-scheme に従う。
+  切り替えたら <html data-theme="light|dark"> を付け、localStorage に保存する。
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Yusei+Magic&family=M+PLUS+Rounded+1c:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap");
+
+:root {
+  /* フォント */
+  --font-heading: "Yusei Magic", sans-serif;
+  --font-body: "M PLUS Rounded 1c", sans-serif;
+  --font-number: "DM Mono", monospace;
+
+  /* 基本の色（ライト） */
+  --color-bg: #FFFDFA;
+  --color-surface: #FFFFFF;
+  --color-line: #EEE6DC;
+  --color-text: #2E2620;
+  --color-text-sub: #6E6259;
+  --color-shadow: #EFE4D6;      /* ぼすもちの足元の影 */
+  --color-hover: #FBF6EF;       /* 表の行に触れたとき */
+
+  /* セクションの色（ライト） */
+  --color-game: #F7DFA0;        /* 山吹：ゲーム */
+  --color-rank: #F4B8A4;        /* 朱：ランキング・記録更新 */
+  --color-news: #CFE3B0;        /* 若草：お知らせ */
+  --color-about: #F8CFA8;       /* 杏：自己紹介 */
+  --color-on-game: #4A3A12;     /* 山吹の面に文字をのせるとき */
+
+  /* ぼすもち専用（テーマで変えない） */
+  --mochi-body: #FFFFFF;
+  --mochi-line: #3A2E26;
+  --mochi-eye: #2A211B;
+  --mochi-cheek: #F8CFA8;
+  --mochi-sweat: #D6E9F2;
+
+  /* 形 */
+  --radius-card: 14px;
+  --radius-control: 10px;
+  --tap-min: 44px;
+  --content-max: 1120px;
+  --content-narrow: 880px;
+
+  /* 動き */
+  --dur-fast: 0.2s;
+  --dur-base: 0.3s;
+  --dur-countup: 0.9s;
+  --ease-pop: cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #1C1916;
+    --color-surface: #26221E;
+    --color-line: #3A342E;
+    --color-text: #F4EEE6;
+    --color-text-sub: #BDB2A6;
+    --color-shadow: #2E2823;
+    --color-hover: #24201C;
+    --color-game: rgba(247, 223, 160, 0.32);
+    --color-rank: rgba(244, 184, 164, 0.30);
+    --color-news: rgba(207, 227, 176, 0.30);
+    --color-about: rgba(248, 207, 168, 0.32);
+    --color-on-game: #F4EEE6;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #1C1916;
+  --color-surface: #26221E;
+  --color-line: #3A342E;
+  --color-text: #F4EEE6;
+  --color-text-sub: #BDB2A6;
+  --color-shadow: #2E2823;
+  --color-hover: #24201C;
+  --color-game: rgba(247, 223, 160, 0.32);
+  --color-rank: rgba(244, 184, 164, 0.30);
+  --color-news: rgba(207, 227, 176, 0.30);
+  --color-about: rgba(248, 207, 168, 0.32);
+  --color-on-game: #F4EEE6;
+}
+
+/* 見出しのマーカー：<span class="mark" style="--m: var(--color-game)">高得点</span> */
+.mark {
+  background-image: linear-gradient(var(--m), var(--m));
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 100% 42%;
+  padding: 0 4px;
+}
+
+@supports (animation-timeline: view()) {
+  .mark {
+    animation: mark-fill linear both;
+    animation-timeline: view();
+    animation-range: entry 30% cover 40%;
+  }
+}
+
+@keyframes mark-fill {
+  from { background-size: 0% 42%; }
+  to   { background-size: 100% 42%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

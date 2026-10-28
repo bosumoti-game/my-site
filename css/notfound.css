@@ -1,0 +1,70 @@
+/*
+  404。仕様は docs/pages.md「404」。
+*/
+
+.notfound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 56px 24px 96px;
+  text-align: center;
+}
+
+.notfound__mochi {
+  width: 200px;
+  height: auto;
+}
+
+.notfound__shadow {
+  fill: var(--color-shadow);
+}
+
+/* 汗がときどき垂れる */
+.notfound__sweat {
+  animation: sweat-drip 2.4s ease-in-out infinite;
+}
+
+@keyframes sweat-drip {
+  0%, 60% { transform: translateY(0); opacity: 1; }
+  85%     { transform: translateY(6px); opacity: 0.2; }
+  100%    { transform: translateY(0); opacity: 1; }
+}
+
+.notfound__code {
+  margin: 0;
+  font-family: var(--font-number);
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.notfound__title {
+  font-size: 36px;
+  line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+  .notfound__title { font-size: 28px; }
+}
+
+.notfound__text {
+  margin: 0;
+  line-height: 1.9;
+  color: var(--color-text-sub);
+}
+
+/* このページで唯一のボタン */
+.notfound__back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  margin-top: 8px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-weight: 700;
+  text-decoration: none;
+}
